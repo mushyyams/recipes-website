@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 
 const GITHUB_AUTHORIZE = "https://github.com/login/oauth/authorize";
 
+export const dynamic = "force-dynamic";
+
 export async function GET(request: Request) {
   const clientId = process.env.GITHUB_CLIENT_ID;
   if (!clientId) {

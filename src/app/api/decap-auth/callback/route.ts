@@ -3,20 +3,32 @@ import { NextResponse } from "next/server";
 
 const GITHUB_TOKEN = "https://github.com/login/oauth/access_token";
 
-function authResponseScript(message: string, content: Record<string, unknown>) {
-  const payload = JSON.stringify({ message, ...content });
+function authResponseHtml(status: "success" | "error", content: Record<string, unknown>) {
+  const payload = JSON.stringify(content);
   return `<!DOCTYPE html><html><body><script>
-    (function () {
-      function send(msg) {
-        if (window.opener) {
-          window.opener.postMessage(msg, "*");
-          window.close();
-        }
-      }
-      send(${payload});
-    })();
-  </script></body></html>`;
+(function () {
+  const msg = "authorization:github:${status}:" + ${JSON.stringify(payload)};
+
+  function sendToken(origin) {
+    if (!window.opener) return;
+    window.opener.postMessage(msg, origin || "*");
+    window.close();
+  }
+
+  window.addEventListener("message", function (e) {
+    if (e.data === "authorizing:github") {
+      sendToken(e.origin);
+    }
+  }, false);
+
+  if (window.opener) {
+    window.opener.postMessage("authorizing:github", "*");
+  }
+})();
+</script></body></html>`;
 }
+
+export const dynamic = "force-dynamic";
 
 export async function GET(request: Request) {
   const clientId = process.env.GITHUB_CLIENT_ID;
@@ -24,8 +36,8 @@ export async function GET(request: Request) {
 
   if (!clientId || !clientSecret) {
     return new NextResponse(
-      authResponseScript("error", {
-        error: "GitHub OAuth is not configured on the server.",
+      authResponseHtml("error", {
+        message: "GitHub OAuth is not configured on the server.",
       }),
       { headers: { "Content-Type": "text/html" } }
     );
@@ -41,7 +53,7 @@ export async function GET(request: Request) {
 
   if (!code || !state || !savedState || state !== savedState) {
     return new NextResponse(
-      authResponseScript("error", { error: "OAuth state mismatch." }),
+      authResponseHtml("error", { message: "OAuth state mismatch." }),
       { headers: { "Content-Type": "text/html" } }
     );
   }
@@ -68,15 +80,16 @@ export async function GET(request: Request) {
 
   if (!tokenResponse.ok || !tokenData.access_token) {
     return new NextResponse(
-      authResponseScript("error", {
-        error: tokenData.error_description ?? "Could not complete GitHub login.",
+      authResponseHtml("error", {
+        message:
+          tokenData.error_description ?? "Could not complete GitHub login.",
       }),
       { headers: { "Content-Type": "text/html" } }
     );
   }
 
   return new NextResponse(
-    authResponseScript("success", {
+    authResponseHtml("success", {
       token: tokenData.access_token,
       provider: "github",
     }),
