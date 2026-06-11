@@ -1,4 +1,5 @@
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { createClient } from "@supabase/supabase-js";
 
 export type RecipeFork = {
   id: string;
@@ -144,5 +145,48 @@ export async function createFork(
   }
 
   return { fork: mapFork(data as ForkRow) };
+}
+
+export async function getAllForks(): Promise<RecipeFork[]> {
+  const supabase = createSupabaseServerClient();
+  if (!supabase) return [];
+
+  const { data, error } = await supabase
+    .from("recipe_forks")
+    .select("*")
+    .order("created_at", { ascending: false });
+
+  if (error || !data) return [];
+
+  return data.map((row) => mapFork(row as ForkRow));
+}
+
+export async function deleteForkById(
+  forkId: string
+): Promise<{ success: boolean; error?: string }> {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+  if (!url || !serviceKey) {
+    return {
+      success: false,
+      error: "Delete requires SUPABASE_SERVICE_ROLE_KEY on the server.",
+    };
+  }
+
+  const supabase = createClient(url, serviceKey, {
+    auth: { persistSession: false, autoRefreshToken: false },
+  });
+
+  const { error } = await supabase
+    .from("recipe_forks")
+    .delete()
+    .eq("id", forkId);
+
+  if (error) {
+    return { success: false, error: "Could not delete fork." };
+  }
+
+  return { success: true };
 }
 

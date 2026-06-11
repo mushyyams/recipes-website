@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { IngredientList } from "@/components/IngredientList";
+import { RecipeRating } from "@/components/RecipeRating";
 import { StepList } from "@/components/StepList";
 import { getForkById } from "@/lib/forks";
 import { getRecipeBySlug } from "@/lib/recipes";
@@ -101,6 +102,10 @@ export default async function ForkPage({ params }: PageProps) {
           <aside className="order-1 lg:order-2">
             <div className="lg:sticky lg:top-24 space-y-6">
               <IngredientList ingredients={fork.ingredients} />
+
+              <div className="mt-6">
+                <RecipeRating targetType="fork" forkId={fork.id} />
+              </div>
 
               <div className="rounded-[1.5rem] border border-stone bg-cream p-6">
                 <p className="font-display text-lg font-medium text-ink">

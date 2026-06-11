@@ -7,6 +7,7 @@ import { ForkRecipePanel } from "@/components/ForkRecipePanel";
 import { ForkVariations } from "@/components/ForkVariations";
 import { IngredientList } from "@/components/IngredientList";
 import { RecipeMetaBar } from "@/components/RecipeMeta";
+import { RecipeRating } from "@/components/RecipeRating";
 import { StepList } from "@/components/StepList";
 import { getForksForRecipe } from "@/lib/forks";
 import { getAllRecipes, getRecipeBySlug } from "@/lib/recipes";
@@ -93,6 +94,10 @@ export default async function RecipePage({ params }: PageProps) {
           </div>
 
           <RecipeMetaBar recipe={recipe} />
+
+          <div className="pt-6">
+            <RecipeRating targetType="original" recipeSlug={recipe.slug} />
+          </div>
 
           {recipe.tags.length > 0 && (
             <div className="flex flex-wrap gap-2 pt-6">

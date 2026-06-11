@@ -1,9 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { RecipeFork } from "@/lib/forks";
 import { summarizeForkChanges } from "@/lib/fork-utils";
+import type { RatingSummaryWithUser } from "@/lib/ratings";
+import { getOrCreateRaterKey } from "@/lib/rater-key";
 import type { RecipeMeta } from "@/lib/recipes";
 
 type ForkVariationsProps = {
@@ -13,6 +15,24 @@ type ForkVariationsProps = {
 
 export function ForkVariations({ recipe, forks }: ForkVariationsProps) {
   const [open, setOpen] = useState(false);
+  const [forkRatings, setForkRatings] = useState<
+    Record<string, RatingSummaryWithUser>
+  >({});
+
+  useEffect(() => {
+    if (!open || forks.length === 0) return;
+
+    const forkIds = forks.map((fork) => fork.id).join(",");
+    const raterKey = getOrCreateRaterKey();
+    fetch(
+      `/api/ratings?forkIds=${encodeURIComponent(forkIds)}&raterKey=${encodeURIComponent(raterKey)}`
+    )
+      .then((res) => res.json())
+      .then((data: { summaries?: Record<string, RatingSummaryWithUser> }) => {
+        if (data.summaries) setForkRatings(data.summaries);
+      })
+      .catch(() => {});
+  }, [open, forks]);
 
   if (forks.length === 0) return null;
 
@@ -71,6 +91,13 @@ export function ForkVariations({ recipe, forks }: ForkVariationsProps) {
                     <p className="mt-2 text-xs text-sage">
                       {summarizeForkChanges(recipe, fork)}
                     </p>
+                    {forkRatings[fork.id]?.count ? (
+                      <p className="mt-2 text-xs text-ink-muted">
+                        ★ {forkRatings[fork.id].average?.toFixed(1)} (
+                        {forkRatings[fork.id].count} rating
+                        {forkRatings[fork.id].count === 1 ? "" : "s"})
+                      </p>
+                    ) : null}
                   </div>
                   <span className="shrink-0 pt-1 text-sm text-clay opacity-0 transition-opacity group-hover:opacity-100">
                     View →
