@@ -11,8 +11,6 @@ backend:
 media_folder: public/images/recipes
 public_folder: /images/recipes
 
-publish_mode: editorial_workflow
-
 locale: en
 
 collections:
