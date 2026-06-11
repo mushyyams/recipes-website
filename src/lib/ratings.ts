@@ -41,6 +41,13 @@ function buildSummary(rows: RatingRow[], raterKey?: string): RatingSummary {
 
 export type RatingSummaryWithUser = RatingSummary & { userRating?: number };
 
+function ratingSaveErrorMessage(error: { code?: string; message?: string }) {
+  if (error.code === "PGRST205" || error.message?.includes("recipe_ratings")) {
+    return "Ratings storage is not set up yet. Run supabase/migrations/002_recipe_ratings.sql in Supabase.";
+  }
+  return "Could not save your rating. Please try again.";
+}
+
 export async function getRatingSummary(
   targetType: RatingTargetType,
   target: { recipeSlug?: string; forkId?: string },
@@ -125,7 +132,7 @@ export async function submitRating(input: {
       : await supabase.from("recipe_ratings").insert(row);
 
     if (error) {
-      return { error: "Could not save your rating. Please try again." };
+      return { error: ratingSaveErrorMessage(error) };
     }
   } else {
     if (!input.forkId?.trim()) {
@@ -150,7 +157,7 @@ export async function submitRating(input: {
       : await supabase.from("recipe_ratings").insert(row);
 
     if (error) {
-      return { error: "Could not save your rating. Please try again." };
+      return { error: ratingSaveErrorMessage(error) };
     }
   }
 
