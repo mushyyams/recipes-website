@@ -46,6 +46,12 @@ export default function AboutPage() {
             </div>
 
             <div className="mt-10 flex flex-wrap gap-4">
+              <Link
+                href="/recipes"
+                className="rounded-full bg-clay px-6 py-3 text-sm font-medium text-cream transition-colors hover:bg-clay-light"
+              >
+                Browse recipes
+              </Link>
               <a
                 href={siteConfig.social.tiktok}
                 target="_blank"
@@ -68,10 +74,10 @@ export default function AboutPage() {
           <div className="relative">
             <div className="relative aspect-[4/5] overflow-hidden rounded-[2rem] bg-parchment">
               <Image
-                src="https://images.unsplash.com/photo-1556910103-1c02745aae4d?w=800&q=80"
-                alt="Cooking in a bright kitchen"
+                src="/images/about-author.png"
+                alt={`${siteConfig.author} smiling outdoors`}
                 fill
-                className="object-cover"
+                className="object-cover object-top"
                 sizes="(max-width: 1024px) 100vw, 50vw"
               />
             </div>
@@ -83,46 +89,6 @@ export default function AboutPage() {
             </div>
           </div>
         </div>
-
-        <section className="mt-24 rounded-[2rem] bg-parchment p-8 md:p-12">
-          <h2 className="font-display text-2xl font-medium text-ink">
-            How to use this site
-          </h2>
-          <div className="mt-8 grid gap-8 md:grid-cols-3">
-            <div>
-              <p className="font-display text-lg font-medium text-clay">01</p>
-              <p className="mt-2 font-medium text-ink">Watch the video</p>
-              <p className="mt-2 text-sm leading-relaxed text-ink-muted">
-                Start on TikTok for the quick, visual version — see the texture,
-                hear the sizzle.
-              </p>
-            </div>
-            <div>
-              <p className="font-display text-lg font-medium text-clay">02</p>
-              <p className="mt-2 font-medium text-ink">Read the full recipe</p>
-              <p className="mt-2 text-sm leading-relaxed text-ink-muted">
-                Come here for exact measurements, timing, and the tips from the
-                comment section.
-              </p>
-            </div>
-            <div>
-              <p className="font-display text-lg font-medium text-clay">03</p>
-              <p className="mt-2 font-medium text-ink">Cook it your way</p>
-              <p className="mt-2 text-sm leading-relaxed text-ink-muted">
-                These are starting points, not commandments. Adjust, substitute,
-                make it yours.
-              </p>
-            </div>
-          </div>
-          <div className="mt-10">
-            <Link
-              href="/recipes"
-              className="text-sm font-medium text-clay hover:underline"
-            >
-              Browse all recipes →
-            </Link>
-          </div>
-        </section>
       </div>
     </div>
   );

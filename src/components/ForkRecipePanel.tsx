@@ -10,8 +10,8 @@ export function ForkRecipePanel({ slug, forkCount }: ForkRecipePanelProps) {
     <div className="mt-6 rounded-[1.5rem] border border-dashed border-sage/40 bg-cream p-6">
       <p className="font-display text-lg font-medium text-ink">Fork this recipe</p>
       <p className="mt-2 text-sm leading-relaxed text-ink-muted">
-        Made a tweak? Save your version for others to find — like GitHub, but for
-        dinner.
+        Made a tweak? Save your version for others to find. A fork in the road
+        for the fork on your plate.
       </p>
       <Link
         href={`/recipes/${slug}/fork`}

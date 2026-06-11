@@ -131,8 +131,7 @@ export default async function RecipePage({ params }: PageProps) {
                   Watched the video?
                 </p>
                 <p className="mt-2 text-sm leading-relaxed text-ink-muted">
-                  This is the full write-up with exact measurements and the tips
-                  I mention in the comments.
+                  This is the full write-up with exact measurements and tips.
                 </p>
                 <a
                   href={siteConfig.social.tiktok}
