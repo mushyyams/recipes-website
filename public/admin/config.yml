@@ -1,0 +1,115 @@
+# Update `repo` and `branch` to match your GitHub repository before deploying.
+# For local editing with live GitHub saves, run `npm run cms` in another terminal.
+
+backend:
+  name: github
+  repo: mushyyams/recipes-website
+  branch: main
+  base_url: https://recipes-website.vercel.app
+  auth_endpoint: api/decap-auth
+
+media_folder: public/images/recipes
+public_folder: /images/recipes
+
+publish_mode: editorial_workflow
+
+locale: en
+
+collections:
+  - name: recipes
+    label: Recipes
+    label_singular: Recipe
+    folder: content/recipes
+    create: true
+    slug: "{{slug}}"
+    extension: md
+    format: frontmatter
+    identifier_field: title
+    summary: "{{title}} — {{category}}"
+    fields:
+      - label: Title
+        name: title
+        widget: string
+      - label: URL slug
+        name: slug
+        widget: string
+        hint: Lowercase with hyphens, e.g. honey-garlic-salmon
+        pattern: ['^[a-z0-9]+(?:-[a-z0-9]+)*$', 'Use lowercase letters, numbers, and hyphens only']
+      - label: Excerpt
+        name: excerpt
+        widget: text
+        hint: One compelling sentence for cards and search results
+      - label: Category
+        name: category
+        widget: select
+        options:
+          - Dinner
+          - Lunch
+          - Breakfast
+          - Snacks
+          - Pasta
+          - Dessert
+          - Drinks
+      - label: Tags
+        name: tags
+        widget: list
+        default: []
+        field:
+          label: Tag
+          name: tag
+          widget: string
+      - label: Prep time
+        name: prepTime
+        widget: string
+        default: "10 min"
+      - label: Cook time
+        name: cookTime
+        widget: string
+        default: "20 min"
+      - label: Servings
+        name: servings
+        widget: number
+        value_type: int
+        min: 1
+      - label: Difficulty
+        name: difficulty
+        widget: select
+        options:
+          - Easy
+          - Medium
+          - Advanced
+      - label: Featured on homepage
+        name: featured
+        widget: boolean
+        default: false
+      - label: Published date
+        name: publishedAt
+        widget: datetime
+        date_format: YYYY-MM-DD
+        time_format: false
+        default: ""
+      - label: Hero image
+        name: image
+        widget: image
+        allow_multiple: false
+      - label: Image alt text
+        name: imageAlt
+        widget: string
+      - label: Ingredients
+        name: ingredients
+        widget: list
+        field:
+          label: Ingredient
+          name: ingredient
+          widget: string
+      - label: Method steps
+        name: steps
+        widget: list
+        field:
+          label: Step
+          name: step
+          widget: text
+      - label: Article body
+        name: body
+        widget: markdown
+        hint: Editorial notes, TikTok context, substitutions, and extra technique

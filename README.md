@@ -1,36 +1,114 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Slow Flame — Recipe Publication
 
-## Getting Started
+A publication-style recipe website for TikTok creators. Publish full recipe articles via Decap CMS, and let readers fork recipes like GitHub repos.
 
-First, run the development server:
+## Getting started
 
 ```bash
+npm install
+cp .env.example .env.local
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Publish recipes (Decap CMS)
 
-## Learn More
+Your recipes live as markdown in `content/recipes/`. Use the browser editor at **`/admin`** to create and edit them — changes commit to GitHub and Vercel redeploys.
 
-To learn more about Next.js, take a look at the following resources:
+### One-time setup
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+**1. Update `public/admin/config.yml`**
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```yaml
+backend:
+  repo: your-github-username/your-repo-name
+  branch: main
+  base_url: https://your-site.vercel.app   # your production URL
+```
 
-## Deploy on Vercel
+**2. Create a GitHub OAuth App**
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+GitHub → Settings → Developer settings → OAuth Apps → New:
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+| Field | Value |
+|-------|-------|
+| Homepage URL | `https://your-site.vercel.app` |
+| Callback URL | `https://your-site.vercel.app/api/decap-auth/callback` |
+
+Copy the Client ID and generate a Client Secret.
+
+**3. Add env vars in Vercel** (and `.env.local` for local OAuth testing)
+
+```
+GITHUB_CLIENT_ID=
+GITHUB_CLIENT_SECRET=
+```
+
+**4. Local editing with live GitHub saves**
+
+```bash
+npm run dev      # terminal 1
+npm run cms      # terminal 2 — proxies GitHub API locally
+```
+
+Then open [http://localhost:3000/admin](http://localhost:3000/admin).
+
+For local-only editing without GitHub, Decap can use the `test-repo` backend — but production should use `github`.
+
+---
+
+## Recipe forks (Supabase)
+
+Readers can fork a recipe from any article page, tweak it, and publish a variation under their name. Forks appear in a collapsible **Community variations** section on the original recipe — out of the way until someone wants to browse them.
+
+### One-time setup
+
+**1. Create a Supabase project** at [supabase.com](https://supabase.com)
+
+**2. Run the migration**
+
+In Supabase → SQL → New query, paste and run:
+
+`supabase/migrations/001_recipe_forks.sql`
+
+**3. Add env vars**
+
+```
+NEXT_PUBLIC_SUPABASE_URL=
+NEXT_PUBLIC_SUPABASE_ANON_KEY=
+SUPABASE_SERVICE_ROLE_KEY=   # optional; anon key works with the included RLS policies
+```
+
+### Future: user accounts
+
+The `recipe_forks` table already has a nullable `user_id` column. When you add Supabase Auth, link forks to logged-in users and tighten the insert RLS policy.
+
+---
+
+## Deploy to Vercel
+
+1. Push to GitHub
+2. Import at [vercel.com/new](https://vercel.com/new)
+3. Add all environment variables from `.env.example`
+4. Deploy
+
+---
+
+## Project structure
+
+```
+content/recipes/          Your recipes (edited via /admin)
+public/admin/             Decap CMS config
+src/app/api/forks/        Fork create/list API
+src/app/api/decap-auth/   GitHub OAuth for CMS
+src/app/recipes/[slug]/fork/       Fork creation form
+src/app/recipes/[slug]/forks/[id]/ Fork detail page
+supabase/migrations/      Database schema for forks
+```
+
+## Add a recipe manually
+
+Create `content/recipes/my-recipe.md` — see existing files for the frontmatter format. Or use `/admin` after CMS setup.

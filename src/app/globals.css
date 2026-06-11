@@ -1,26 +1,127 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --color-parchment: #f5f0e8;
+  --color-cream: #faf7f2;
+  --color-ink: #1c1b19;
+  --color-ink-muted: #5c5852;
+  --color-clay: #b85c38;
+  --color-clay-light: #d4845f;
+  --color-sage: #6b7f64;
+  --color-sage-light: #8fa387;
+  --color-stone: #e8e2d8;
+  --color-stone-dark: #d4cdc0;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-parchment: #f5f0e8;
+  --color-cream: #faf7f2;
+  --color-ink: #1c1b19;
+  --color-ink-muted: #5c5852;
+  --color-clay: #b85c38;
+  --color-clay-light: #d4845f;
+  --color-sage: #6b7f64;
+  --color-sage-light: #8fa387;
+  --color-stone: #e8e2d8;
+  --color-stone-dark: #d4cdc0;
+  --font-display: var(--font-fraunces), Georgia, serif;
+  --font-body: var(--font-dm-sans), system-ui, sans-serif;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  scroll-behavior: smooth;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--color-cream);
+  color: var(--color-ink);
+  font-family: var(--font-body), system-ui, sans-serif;
+}
+
+::selection {
+  background-color: color-mix(in srgb, var(--color-clay) 25%, transparent);
+}
+
+/* Editorial prose for recipe articles */
+.prose-recipe {
+  font-size: 1.0625rem;
+  line-height: 1.75;
+  color: var(--color-ink-muted);
+}
+
+.prose-recipe h2 {
+  font-family: var(--font-display), Georgia, serif;
+  font-size: 1.625rem;
+  font-weight: 500;
+  color: var(--color-ink);
+  margin-top: 2.5rem;
+  margin-bottom: 1rem;
+  letter-spacing: -0.02em;
+}
+
+.prose-recipe h3 {
+  font-family: var(--font-display), Georgia, serif;
+  font-size: 1.25rem;
+  font-weight: 500;
+  color: var(--color-ink);
+  margin-top: 2rem;
+  margin-bottom: 0.75rem;
+}
+
+.prose-recipe p {
+  margin-bottom: 1.25rem;
+}
+
+.prose-recipe ul,
+.prose-recipe ol {
+  margin-bottom: 1.25rem;
+  padding-left: 1.25rem;
+}
+
+.prose-recipe li {
+  margin-bottom: 0.5rem;
+}
+
+.prose-recipe strong {
+  color: var(--color-ink);
+  font-weight: 600;
+}
+
+.prose-recipe a {
+  color: var(--color-clay);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.prose-recipe blockquote {
+  border-left: 3px solid var(--color-sage-light);
+  padding-left: 1.25rem;
+  margin: 2rem 0;
+  font-family: var(--font-display), Georgia, serif;
+  font-size: 1.25rem;
+  font-style: italic;
+  color: var(--color-ink);
+  line-height: 1.6;
+}
+
+/* Organic blob animation */
+@keyframes blob-drift {
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+  33% {
+    transform: translate(12px, -8px) scale(1.02);
+  }
+  66% {
+    transform: translate(-8px, 6px) scale(0.98);
+  }
+}
+
+.blob-drift {
+  animation: blob-drift 18s ease-in-out infinite;
+}
+
+.blob-drift-slow {
+  animation: blob-drift 24s ease-in-out infinite reverse;
 }
