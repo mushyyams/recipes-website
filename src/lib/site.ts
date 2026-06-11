@@ -2,7 +2,7 @@ export const siteConfig = {
   name: "Community Archive",
   tagline: "Recipes from my kitchen to yours",
   description:
-    "A recipe publication for home cooks — thoughtful dishes, honest technique, and the kind of food worth making twice.",
+    "A recipe repository for home cooks. Thoughtful dishes, community creation, and food worth exploring.",
   author: "Harrison Chen",
   social: {
     tiktok: "https://tiktok.com/@mushyyams",

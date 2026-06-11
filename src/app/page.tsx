@@ -26,11 +26,11 @@ export default function HomePage() {
         <div className="relative mx-auto max-w-6xl px-6 pb-20 pt-16 lg:px-8 lg:pb-28 lg:pt-24">
           <div className="max-w-2xl">
             <p className="text-xs font-medium uppercase tracking-[0.25em] text-sage">
-              A recipe publication
+              A recipe Journal
             </p>
             <h1 className="mt-4 font-display text-5xl font-medium leading-[1.1] tracking-tight text-ink md:text-6xl lg:text-7xl">
-              Food worth{" "}
-              <span className="italic text-clay">making twice.</span>
+              In the kitchen{" "}
+              <span className="italic text-clay">making something.</span>
             </h1>
             <p className="mt-6 max-w-lg text-lg leading-relaxed text-ink-muted">
               {siteConfig.description}
