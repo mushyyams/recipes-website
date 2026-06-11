@@ -5,7 +5,7 @@ backend:
   name: github
   repo: mushyyams/recipes-website
   branch: main
-  base_url: https://recipes-website-mho9v4rk2-chenharrison97-8812s-projects.vercel.app
+  base_url: https://recipes-website-psi.vercel.app
   auth_endpoint: api/decap-auth
 
 media_folder: public/images/recipes
