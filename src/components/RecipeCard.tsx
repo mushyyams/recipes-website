@@ -7,20 +7,67 @@ type RecipeCardProps = {
   recipe: RecipeMeta;
   featured?: boolean;
   rating?: RatingSummary;
+  forkCount?: number;
 };
 
-function RecipeRatingLabel({ rating }: { rating: RatingSummary }) {
-  if (!rating.count) return null;
-
+function ForkIcon() {
   return (
-    <p className="text-xs text-ink-muted">
-      ★ {rating.average?.toFixed(1)} ({rating.count} rating
-      {rating.count === 1 ? "" : "s"})
-    </p>
+    <svg
+      width="14"
+      height="14"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden
+    >
+      <circle cx="12" cy="18" r="3" />
+      <circle cx="6" cy="6" r="3" />
+      <circle cx="18" cy="6" r="3" />
+      <path d="M18 9v3a3 3 0 0 1-3 3 3 3 0 0 0-3 3" />
+      <path d="M6 9v12" />
+    </svg>
   );
 }
 
-export function RecipeCard({ recipe, featured = false, rating }: RecipeCardProps) {
+function RecipeCardMeta({
+  rating,
+  forkCount,
+}: {
+  rating?: RatingSummary;
+  forkCount?: number;
+}) {
+  const hasRating = Boolean(rating?.count);
+  const hasForks = Boolean(forkCount);
+
+  if (!hasRating && !hasForks) return null;
+
+  return (
+    <div className="flex flex-wrap items-center gap-3 text-xs text-ink-muted">
+      {hasRating ? (
+        <span>
+          ★ {rating?.average?.toFixed(1)} ({rating?.count} rating
+          {rating?.count === 1 ? "" : "s"})
+        </span>
+      ) : null}
+      {hasForks ? (
+        <span className="inline-flex items-center gap-1" title="Community forks">
+          <ForkIcon />
+          {forkCount}
+        </span>
+      ) : null}
+    </div>
+  );
+}
+
+export function RecipeCard({
+  recipe,
+  featured = false,
+  rating,
+  forkCount,
+}: RecipeCardProps) {
   if (featured) {
     return (
       <Link
@@ -46,9 +93,9 @@ export function RecipeCard({ recipe, featured = false, rating }: RecipeCardProps
           <h2 className="mt-4 font-display text-3xl font-medium leading-tight tracking-tight text-ink transition-colors group-hover:text-clay md:text-4xl">
             {recipe.title}
           </h2>
-          {rating ? (
+          {(rating?.count || forkCount) ? (
             <div className="mt-3">
-              <RecipeRatingLabel rating={rating} />
+              <RecipeCardMeta rating={rating} forkCount={forkCount} />
             </div>
           ) : null}
           <p className="mt-4 line-clamp-3 text-base leading-relaxed text-ink-muted">
@@ -91,9 +138,9 @@ export function RecipeCard({ recipe, featured = false, rating }: RecipeCardProps
         <h3 className="mt-2 font-display text-xl font-medium leading-snug tracking-tight text-ink transition-colors group-hover:text-clay">
           {recipe.title}
         </h3>
-        {rating ? (
+        {(rating?.count || forkCount) ? (
           <div className="mt-2">
-            <RecipeRatingLabel rating={rating} />
+            <RecipeCardMeta rating={rating} forkCount={forkCount} />
           </div>
         ) : null}
         <p className="mt-2 line-clamp-2 flex-1 text-sm leading-relaxed text-ink-muted">

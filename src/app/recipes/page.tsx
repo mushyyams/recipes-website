@@ -1,4 +1,5 @@
 import { RecipeCard } from "@/components/RecipeCard";
+import { getForkCountsByRecipeSlug } from "@/lib/forks";
 import { getAllRecipes, getAllCategories } from "@/lib/recipes";
 import { getRecipeRatingSummaries } from "@/lib/ratings";
 
@@ -10,9 +11,11 @@ export const metadata = {
 export default async function RecipesPage() {
   const recipes = getAllRecipes();
   const categories = getAllCategories();
-  const ratingSummaries = await getRecipeRatingSummaries(
-    recipes.map((recipe) => recipe.slug)
-  );
+  const recipeSlugs = recipes.map((recipe) => recipe.slug);
+  const [ratingSummaries, forkCounts] = await Promise.all([
+    getRecipeRatingSummaries(recipeSlugs),
+    getForkCountsByRecipeSlug(recipeSlugs),
+  ]);
 
   return (
     <div className="mx-auto max-w-6xl px-6 py-16 lg:px-8 lg:py-24">
@@ -47,6 +50,7 @@ export default async function RecipesPage() {
             key={recipe.slug}
             recipe={recipe}
             rating={ratingSummaries[recipe.slug]}
+            forkCount={forkCounts[recipe.slug]}
           />
         ))}
       </div>

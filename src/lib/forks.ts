@@ -51,6 +51,33 @@ function mapFork(row: ForkRow): RecipeFork {
   };
 }
 
+export async function getForkCountsByRecipeSlug(
+  recipeSlugs: string[]
+): Promise<Record<string, number>> {
+  const result: Record<string, number> = {};
+  if (recipeSlugs.length === 0) return result;
+
+  for (const slug of recipeSlugs) {
+    result[slug] = 0;
+  }
+
+  const supabase = createSupabaseServerClient();
+  if (!supabase) return result;
+
+  const { data, error } = await supabase
+    .from("recipe_forks")
+    .select("original_slug")
+    .in("original_slug", recipeSlugs);
+
+  if (error || !data) return result;
+
+  for (const row of data as { original_slug: string }[]) {
+    result[row.original_slug] = (result[row.original_slug] ?? 0) + 1;
+  }
+
+  return result;
+}
+
 export async function getForksForRecipe(
   originalSlug: string
 ): Promise<RecipeFork[]> {
