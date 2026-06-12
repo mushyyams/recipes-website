@@ -13,6 +13,7 @@ import { JsonLd } from "@/components/JsonLd";
 import { getForksForRecipe } from "@/lib/forks";
 import { buildRecipeJsonLd } from "@/lib/recipe-schema";
 import { getAllRecipes, getRecipeBySlug } from "@/lib/recipes";
+import { getRatingSummary } from "@/lib/ratings";
 import { absoluteUrl, siteConfig } from "@/lib/site";
 
 export const revalidate = 30;
@@ -60,7 +61,10 @@ export default async function RecipePage({ params }: PageProps) {
   const recipe = getRecipeBySlug(slug);
   if (!recipe) notFound();
 
-  const forks = await getForksForRecipe(slug);
+  const [forks, rating] = await Promise.all([
+    getForksForRecipe(slug),
+    getRatingSummary("original", { recipeSlug: slug }),
+  ]);
 
   const formattedDate = new Date(recipe.publishedAt).toLocaleDateString(
     "en-US",
@@ -69,7 +73,7 @@ export default async function RecipePage({ params }: PageProps) {
 
   return (
     <article>
-      <JsonLd data={buildRecipeJsonLd(recipe)} />
+      <JsonLd data={buildRecipeJsonLd(recipe, { rating })} />
       {/* Hero image */}
       <div className="relative aspect-[16/9] w-full max-h-[70vh] overflow-hidden bg-parchment md:aspect-[21/9]">
         <Image
@@ -156,12 +160,12 @@ export default async function RecipePage({ params }: PageProps) {
                   This is the full write-up with exact measurements and tips.
                 </p>
                 <a
-                  href={siteConfig.social.tiktok}
+                  href={recipe.video ?? siteConfig.social.tiktok}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="mt-4 inline-block text-sm font-medium text-clay hover:underline"
                 >
-                  Find it on TikTok →
+                  {recipe.video ? "Watch on TikTok →" : "Find it on TikTok →"}
                 </a>
               </div>
 

@@ -93,6 +93,11 @@ collections:
       - label: Image alt text
         name: imageAlt
         widget: string
+      - label: TikTok video URL
+        name: video
+        widget: string
+        required: false
+        hint: Full TikTok link for this recipe (used in SEO and the sidebar CTA)
       - label: Ingredients
         name: ingredients
         widget: list

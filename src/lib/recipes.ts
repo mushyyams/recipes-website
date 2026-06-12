@@ -18,6 +18,7 @@ export type RecipeMeta = {
   publishedAt: string;
   image: string;
   imageAlt: string;
+  video?: string;
   ingredients: string[];
   steps: string[];
 };
@@ -45,6 +46,7 @@ function parseRecipeFile(filename: string): Recipe {
     publishedAt: data.publishedAt,
     image: data.image,
     imageAlt: data.imageAlt,
+    video: data.video || undefined,
     ingredients: data.ingredients ?? [],
     steps: data.steps ?? [],
     content,

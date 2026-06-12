@@ -1,5 +1,10 @@
 import type { Recipe } from "@/lib/recipes";
+import type { RatingSummary } from "@/lib/ratings";
 import { absoluteUrl, siteConfig } from "@/lib/site";
+
+type RecipeJsonLdOptions = {
+  rating?: RatingSummary;
+};
 
 /** Converts strings like "10 min" or "1 hr 30 min" to ISO 8601 duration (e.g. PT10M). */
 export function parseDurationToIso(time: string): string | undefined {
@@ -23,12 +28,15 @@ export function parseDurationToIso(time: string): string | undefined {
   return iso;
 }
 
-export function buildRecipeJsonLd(recipe: Recipe) {
+export function buildRecipeJsonLd(recipe: Recipe, options: RecipeJsonLdOptions = {}) {
   const prepTime = parseDurationToIso(recipe.prepTime);
   const cookTime = parseDurationToIso(recipe.cookTime);
   const totalMinutes =
     (prepTime ? durationIsoToMinutes(prepTime) : 0) +
     (cookTime ? durationIsoToMinutes(cookTime) : 0);
+  const rating = options.rating;
+  const hasRatings =
+    rating && rating.count > 0 && rating.average !== null;
 
   return {
     "@context": "https://schema.org",
@@ -53,6 +61,29 @@ export function buildRecipeJsonLd(recipe: Recipe) {
       position: index + 1,
       text,
     })),
+    ...(recipe.video
+      ? {
+          video: {
+            "@type": "VideoObject",
+            name: recipe.title,
+            description: recipe.excerpt,
+            thumbnailUrl: [recipe.image],
+            uploadDate: recipe.publishedAt,
+            contentUrl: recipe.video,
+          },
+        }
+      : {}),
+    ...(hasRatings
+      ? {
+          aggregateRating: {
+            "@type": "AggregateRating",
+            ratingValue: rating.average,
+            ratingCount: rating.count,
+            bestRating: 5,
+            worstRating: 1,
+          },
+        }
+      : {}),
     url: absoluteUrl(`/recipes/${recipe.slug}`),
   };
 }
