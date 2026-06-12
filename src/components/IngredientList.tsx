@@ -6,6 +6,10 @@ type IngredientListProps = {
   ingredients: string[];
 };
 
+function isSectionHeader(item: string): boolean {
+  return / Ingredients$|^Fixings$|^Salt and Oil$/.test(item.trim());
+}
+
 export function IngredientList({ ingredients }: IngredientListProps) {
   const [checked, setChecked] = useState<Set<number>>(() => new Set());
 
@@ -26,6 +30,16 @@ export function IngredientList({ ingredients }: IngredientListProps) {
       <h2 className="font-display text-xl font-medium text-ink">Ingredients</h2>
       <ul className="mt-5 space-y-3">
         {ingredients.map((item, index) => {
+          if (isSectionHeader(item)) {
+            return (
+              <li key={`${index}-${item}`} className="pt-2 first:pt-0">
+                <p className="text-xs font-medium uppercase tracking-[0.12em] text-ink">
+                  {item}
+                </p>
+              </li>
+            );
+          }
+
           const isChecked = checked.has(index);
 
           return (
