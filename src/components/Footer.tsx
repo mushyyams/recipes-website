@@ -73,7 +73,7 @@ export function Footer() {
             &copy; {new Date().getFullYear()} {siteConfig.name}. All rights
             reserved.
           </p>
-          <p>Recipes worth making twice.</p>
+          <p>[Placeholder]</p>
         </div>
       </div>
     </footer>

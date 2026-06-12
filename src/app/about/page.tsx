@@ -23,25 +23,20 @@ export default function AboutPage() {
               About
             </p>
             <h1 className="mt-3 font-display text-4xl font-medium tracking-tight text-ink md:text-5xl">
-              The kitchen, on the record.
+              Who me?
             </h1>
             <div className="mt-8 space-y-5 text-base leading-relaxed text-ink-muted">
               <p>
-                Hi — I&apos;m {siteConfig.author}. I make cooking videos on
-                TikTok, and this site is where the recipes live in full: the
-                measurements, the technique notes, and the context that
-                doesn&apos;t fit in sixty seconds.
+                Hi I'm Harrison. I originally made this website to serve as an archive for my recipes.  
               </p>
               <p>
-                Think of it less like a recipe box and more like a small food
-                publication. Every dish here started as something I actually
-                made, filmed, and ate. If it&apos;s on this site, it&apos;s
-                because I&apos;d make it again.
+                I love the concept of food being a driver of community and connection, 
+                and personally, a source of creativity. In the same tune, I want this 
+                website to feel like a place where recipes can be 
+                written, shared, and rediscovered.
               </p>
               <p>
-                The aesthetic? Honest food, written with care. No filler, no
-                life stories before the ingredients — just good recipes with
-                enough personality to feel human.
+                Take a look around.
               </p>
             </div>
 
@@ -80,12 +75,6 @@ export default function AboutPage() {
                 className="object-cover object-top"
                 sizes="(max-width: 1024px) 100vw, 50vw"
               />
-            </div>
-            <div className="absolute -bottom-6 -left-6 rounded-[1.25rem] bg-clay px-6 py-4 text-cream md:-left-10">
-              <p className="font-display text-2xl font-medium">60s</p>
-              <p className="text-xs uppercase tracking-wider opacity-80">
-                to full story
-              </p>
             </div>
           </div>
         </div>

@@ -1,13 +1,26 @@
 import Image from "next/image";
 import Link from "next/link";
+import type { RatingSummary } from "@/lib/ratings";
 import type { RecipeMeta } from "@/lib/recipes";
 
 type RecipeCardProps = {
   recipe: RecipeMeta;
   featured?: boolean;
+  rating?: RatingSummary;
 };
 
-export function RecipeCard({ recipe, featured = false }: RecipeCardProps) {
+function RecipeRatingLabel({ rating }: { rating: RatingSummary }) {
+  if (!rating.count) return null;
+
+  return (
+    <p className="text-xs text-ink-muted">
+      ★ {rating.average?.toFixed(1)} ({rating.count} rating
+      {rating.count === 1 ? "" : "s"})
+    </p>
+  );
+}
+
+export function RecipeCard({ recipe, featured = false, rating }: RecipeCardProps) {
   if (featured) {
     return (
       <Link
@@ -33,6 +46,11 @@ export function RecipeCard({ recipe, featured = false }: RecipeCardProps) {
           <h2 className="mt-4 font-display text-3xl font-medium leading-tight tracking-tight text-ink transition-colors group-hover:text-clay md:text-4xl">
             {recipe.title}
           </h2>
+          {rating ? (
+            <div className="mt-3">
+              <RecipeRatingLabel rating={rating} />
+            </div>
+          ) : null}
           <p className="mt-4 line-clamp-3 text-base leading-relaxed text-ink-muted">
             {recipe.excerpt}
           </p>
@@ -73,6 +91,11 @@ export function RecipeCard({ recipe, featured = false }: RecipeCardProps) {
         <h3 className="mt-2 font-display text-xl font-medium leading-snug tracking-tight text-ink transition-colors group-hover:text-clay">
           {recipe.title}
         </h3>
+        {rating ? (
+          <div className="mt-2">
+            <RecipeRatingLabel rating={rating} />
+          </div>
+        ) : null}
         <p className="mt-2 line-clamp-2 flex-1 text-sm leading-relaxed text-ink-muted">
           {recipe.excerpt}
         </p>

@@ -1,14 +1,18 @@
 import { RecipeCard } from "@/components/RecipeCard";
 import { getAllRecipes, getAllCategories } from "@/lib/recipes";
+import { getRecipeRatingSummaries } from "@/lib/ratings";
 
 export const metadata = {
   title: "Recipes",
   description: "Browse all recipes from the kitchen — dinners, snacks, pasta, and more.",
 };
 
-export default function RecipesPage() {
+export default async function RecipesPage() {
   const recipes = getAllRecipes();
   const categories = getAllCategories();
+  const ratingSummaries = await getRecipeRatingSummaries(
+    recipes.map((recipe) => recipe.slug)
+  );
 
   return (
     <div className="mx-auto max-w-6xl px-6 py-16 lg:px-8 lg:py-24">
@@ -20,9 +24,7 @@ export default function RecipesPage() {
           All recipes
         </h1>
         <p className="mt-4 text-lg leading-relaxed text-ink-muted">
-          Every dish here started as a video. These are the full write-ups — with
-          measurements, technique notes, and the context that didn&apos;t fit in
-          sixty seconds.
+          Here they are- the thing you were looking for. Explor or filter by tag.
         </p>
       </header>
 
@@ -41,7 +43,11 @@ export default function RecipesPage() {
 
       <div className="mt-12 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
         {recipes.map((recipe) => (
-          <RecipeCard key={recipe.slug} recipe={recipe} />
+          <RecipeCard
+            key={recipe.slug}
+            recipe={recipe}
+            rating={ratingSummaries[recipe.slug]}
+          />
         ))}
       </div>
     </div>

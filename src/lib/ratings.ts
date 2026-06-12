@@ -170,6 +170,38 @@ export async function submitRating(input: {
   return { summary };
 }
 
+export async function getRecipeRatingSummaries(
+  recipeSlugs: string[],
+  raterKey?: string
+): Promise<Record<string, RatingSummaryWithUser>> {
+  const result: Record<string, RatingSummaryWithUser> = {};
+  if (recipeSlugs.length === 0) return result;
+
+  const supabase = createSupabaseServerClient();
+  if (!supabase) return result;
+
+  const { data, error } = await supabase
+    .from("recipe_ratings")
+    .select("recipe_slug, rating, rater_key")
+    .eq("target_type", "original")
+    .in("recipe_slug", recipeSlugs);
+
+  if (error || !data) return result;
+
+  const grouped = new Map<string, RatingRow[]>();
+  for (const row of data as (RatingRow & { recipe_slug: string })[]) {
+    const list = grouped.get(row.recipe_slug) ?? [];
+    list.push({ rating: row.rating, rater_key: row.rater_key });
+    grouped.set(row.recipe_slug, list);
+  }
+
+  for (const recipeSlug of recipeSlugs) {
+    result[recipeSlug] = buildSummary(grouped.get(recipeSlug) ?? [], raterKey);
+  }
+
+  return result;
+}
+
 export async function getForkRatingSummaries(
   forkIds: string[],
   raterKey?: string
