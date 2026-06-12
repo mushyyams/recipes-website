@@ -26,8 +26,7 @@ ingredients:
   - Salt and Oil
   - 4g salt (1 1/4 tsp)
   - 9g olive oil (2 tsp)
-  - Fixings
-  - 1 bunch green onion
+  - 1 bunch green onion (optional)
 steps:
   - Mix the dry ingredients in a bowl.
   - Add the wet ingredients and mix roughly until a shaggy dough forms.
@@ -44,13 +43,14 @@ steps:
     flipping and cooking 2–3 minutes per side.
   - Drizzle with oil or butter and serve.
 ---
-
-These are the hand-mixed dough stages for scallion bazlama — built in two short rests so the flour hydrates before the salt, oil, and green onion go in. The matte finish on the dough is your signal that the oil is worked in.
+This recipe has two short, built-in rests so the flour hydrates before the salt, oil, and green onion go in. The matte finish on the dough is your signal that the oil is worked in.\
+\
+These flatbreads are great served as a side dish or on it's own with a plat of olive oil and balsamic vinegar. 
 
 ## On the rests
 
-The first 15-minute rest lets the shaggy dough relax without overworking it. The second rest, after kneading, gives the gluten a breather before you divide and shape.
+The first 15-minute rest lets the shaggy dough relax without overworking it. The second rest, after kneading, gives the gluten time to relax before you divide and shape.
 
 ## Proofing
 
-One to two hours at room temperature is the window here. The balls should look puffy and relaxed before you roll them out and cook.
+One to two hours at room temperature is the window here. The balls should look puffy and airy before you roll them out and cook.
