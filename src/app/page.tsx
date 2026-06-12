@@ -1,14 +1,29 @@
 import Link from "next/link";
 import { RecipeCard } from "@/components/RecipeCard";
 import { OrganicBlob } from "@/components/OrganicBlob";
+import { getForkCountsByRecipeSlug } from "@/lib/forks";
 import { getAllRecipes, getFeaturedRecipes } from "@/lib/recipes";
+import { getRecipeRatingSummaries } from "@/lib/ratings";
 import { siteConfig } from "@/lib/site";
 
-export default function HomePage() {
+export default async function HomePage() {
   const featured = getFeaturedRecipes();
   const heroRecipe = featured[0];
   const latest = getAllRecipes().slice(0, 3);
   const secondaryFeatured = featured.slice(1);
+
+  const displayedSlugs = [
+    ...new Set([
+      ...(heroRecipe ? [heroRecipe.slug] : []),
+      ...latest.map((recipe) => recipe.slug),
+      ...secondaryFeatured.map((recipe) => recipe.slug),
+    ]),
+  ];
+
+  const [ratingSummaries, forkCounts] = await Promise.all([
+    getRecipeRatingSummaries(displayedSlugs),
+    getForkCountsByRecipeSlug(displayedSlugs),
+  ]);
 
   return (
     <>
@@ -68,7 +83,12 @@ export default function HomePage() {
               </h2>
             </div>
           </div>
-          <RecipeCard recipe={heroRecipe} featured />
+          <RecipeCard
+            recipe={heroRecipe}
+            featured
+            rating={ratingSummaries[heroRecipe.slug]}
+            forkCount={forkCounts[heroRecipe.slug]}
+          />
         </section>
       )}
 
@@ -94,7 +114,12 @@ export default function HomePage() {
 
           <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
             {latest.map((recipe) => (
-              <RecipeCard key={recipe.slug} recipe={recipe} />
+              <RecipeCard
+                key={recipe.slug}
+                recipe={recipe}
+                rating={ratingSummaries[recipe.slug]}
+                forkCount={forkCounts[recipe.slug]}
+              />
             ))}
           </div>
 
@@ -114,7 +139,12 @@ export default function HomePage() {
         <section className="mx-auto max-w-6xl px-6 py-20 lg:px-8">
           <div className="grid gap-8 lg:grid-cols-2">
             {secondaryFeatured.map((recipe) => (
-              <RecipeCard key={recipe.slug} recipe={recipe} />
+              <RecipeCard
+                key={recipe.slug}
+                recipe={recipe}
+                rating={ratingSummaries[recipe.slug]}
+                forkCount={forkCounts[recipe.slug]}
+              />
             ))}
           </div>
         </section>
