@@ -1,11 +1,14 @@
 import Image from "next/image";
 import Link from "next/link";
 import { OrganicBlob } from "@/components/OrganicBlob";
-import { siteConfig } from "@/lib/site";
+import { absoluteUrl, siteConfig } from "@/lib/site";
 
 export const metadata = {
   title: "About",
   description: `About ${siteConfig.name} — recipes from the kitchen, told like stories.`,
+  alternates: {
+    canonical: absoluteUrl("/about"),
+  },
 };
 
 export default function AboutPage() {

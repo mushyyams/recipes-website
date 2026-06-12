@@ -158,7 +158,7 @@ export default async function HomePage() {
         />
         <div className="relative mx-auto max-w-6xl px-6 py-20 text-center lg:px-8">
           <p className="text-xs font-medium uppercase tracking-[0.2em] text-sage">
-            New recipes weekly
+            New recipes every two weeks
           </p>
           <h2 className="mx-auto mt-4 max-w-lg font-display text-3xl font-medium text-ink md:text-4xl">
             Every dish starts as a video. The good ones end up here.

@@ -2,10 +2,14 @@ import { RecipeCard } from "@/components/RecipeCard";
 import { getForkCountsByRecipeSlug } from "@/lib/forks";
 import { getAllRecipes, getAllCategories } from "@/lib/recipes";
 import { getRecipeRatingSummaries } from "@/lib/ratings";
+import { absoluteUrl } from "@/lib/site";
 
 export const metadata = {
   title: "Recipes",
   description: "Browse all recipes from the kitchen — dinners, snacks, pasta, and more.",
+  alternates: {
+    canonical: absoluteUrl("/recipes"),
+  },
 };
 
 export default async function RecipesPage() {
@@ -27,7 +31,7 @@ export default async function RecipesPage() {
           All recipes
         </h1>
         <p className="mt-4 text-lg leading-relaxed text-ink-muted">
-          Here they are- the thing you were looking for. Explor or filter by tag.
+          Browse the full archive — filter by category below.
         </p>
       </header>
 

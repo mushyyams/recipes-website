@@ -9,9 +9,11 @@ import { IngredientList } from "@/components/IngredientList";
 import { RecipeMetaBar } from "@/components/RecipeMeta";
 import { RecipeRating } from "@/components/RecipeRating";
 import { StepList } from "@/components/StepList";
+import { JsonLd } from "@/components/JsonLd";
 import { getForksForRecipe } from "@/lib/forks";
+import { buildRecipeJsonLd } from "@/lib/recipe-schema";
 import { getAllRecipes, getRecipeBySlug } from "@/lib/recipes";
-import { siteConfig } from "@/lib/site";
+import { absoluteUrl, siteConfig } from "@/lib/site";
 
 export const revalidate = 30;
 
@@ -28,13 +30,27 @@ export async function generateMetadata({ params }: PageProps) {
   const recipe = getRecipeBySlug(slug);
   if (!recipe) return {};
 
+  const recipeUrl = absoluteUrl(`/recipes/${slug}`);
+
   return {
     title: recipe.title,
     description: recipe.excerpt,
+    alternates: {
+      canonical: recipeUrl,
+    },
     openGraph: {
       title: recipe.title,
       description: recipe.excerpt,
+      type: "article",
+      url: recipeUrl,
+      publishedTime: recipe.publishedAt,
       images: [{ url: recipe.image, alt: recipe.imageAlt }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: recipe.title,
+      description: recipe.excerpt,
+      images: [recipe.image],
     },
   };
 }
@@ -53,6 +69,7 @@ export default async function RecipePage({ params }: PageProps) {
 
   return (
     <article>
+      <JsonLd data={buildRecipeJsonLd(recipe)} />
       {/* Hero image */}
       <div className="relative aspect-[16/9] w-full max-h-[70vh] overflow-hidden bg-parchment md:aspect-[21/9]">
         <Image
