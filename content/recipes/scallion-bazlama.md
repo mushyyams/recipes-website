@@ -14,7 +14,7 @@ difficulty: Medium
 featured: false
 publishedAt: 2026-06-12
 image: /images/recipes/img_0199.jpeg
-imageAlt: Fresh flatbread with herbs on a wooden board
+imageAlt: Fresh flatbread stacked on a plate
 video: https://www.tiktok.com/@mushyyams/video/7243162469798071598
 ingredients:
   - Dry Ingredients
