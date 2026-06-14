@@ -29,23 +29,22 @@ ingredients:
   - 1 bunch green onion (optional)
 steps:
   - Mix the dry ingredients in a bowl.
-  - Add the wet ingredients and mix roughly until a shaggy dough forms.
-  - Cover the bowl with a tray or wet towel and rest for 15 minutes.
-  - Mix in the salt, oil, and fixings. Knead until the oil is fully incorporated
-    — the dough surface should change from a shiny sheen to matte.
-  - Cover the bowl with a tray or wet towel and rest for 15 minutes.
+  - Add the wet ingredients and mix roughly until a shaggy dough forms. Let it
+    rest for 15 minutes.
+  - Mix in the salt, oil, and fixings. Knead until the oil is fully
+    incorporated. The dough surface should change from a shiny sheen to matte.
+    Let it rest for another 15 minutes.
   - Transfer the dough to a lightly floured work surface and divide into 6 equal
-    pieces (one per serving).
-  - Form each piece into a ball, lightly dust the tops, cover, and proof for 1–2
-    hours.
-  - Roll each ball out to ¼ inch thickness.
-  - Heat a skillet over medium heat and cook the flattened dough one at a time,
-    flipping and cooking 2–3 minutes per side.
-  - Drizzle with oil or butter and serve.
+    pieces (one per serving). Form each piece into a ball, cover, and proof for
+    1–2 hours.
+  - Flatten each ball out to ¼ inch thickness. Heat a skillet over medium heat
+    and cook the flattened dough one at a time, flipping and cooking 2–3 minutes
+    per side.
+  - Brush with oil or butter and serve.
 ---
 This recipe has two short, built-in rests so the flour hydrates before the salt, oil, and green onion go in. The matte finish on the dough is your signal that the oil is worked in.\
 \
-These flatbreads are great served as a side dish or on it's own with a plat of olive oil and balsamic vinegar. 
+These flatbreads are great served as a side dish, served with a plate of olive oil and balsamic vinegar. 
 
 ## On the rests
 
