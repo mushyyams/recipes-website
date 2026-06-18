@@ -119,6 +119,12 @@ export function ForkModerationAdmin() {
       <div className="mx-auto max-w-md px-6 py-24">
         <div className="flex flex-wrap gap-x-4 gap-y-1">
           <Link
+            href="/admin/submissions"
+            className="text-sm font-medium text-clay hover:underline"
+          >
+            Review submissions →
+          </Link>
+          <Link
             href="/admin/units"
             className="text-sm font-medium text-clay hover:underline"
           >
@@ -161,6 +167,12 @@ export function ForkModerationAdmin() {
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
           <div className="flex flex-wrap gap-x-4 gap-y-1">
+            <Link
+              href="/admin/submissions"
+              className="text-sm font-medium text-clay hover:underline"
+            >
+              Review submissions →
+            </Link>
             <Link
               href="/admin/units"
               className="text-sm font-medium text-clay hover:underline"

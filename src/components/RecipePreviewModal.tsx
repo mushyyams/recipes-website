@@ -20,6 +20,8 @@ type RecipePreviewModalProps = {
   ingredients: RecipeIngredientLine[];
   steps: RecipeStepLine[];
   content: string;
+  confirmLabel?: string;
+  previewTitle?: string;
 };
 
 export function RecipePreviewModal({
@@ -27,6 +29,8 @@ export function RecipePreviewModal({
   onClose,
   onConfirm,
   confirming = false,
+  confirmLabel = "Publish fork",
+  previewTitle = "Review before publishing",
   title,
   excerpt,
   authorName,
@@ -48,7 +52,7 @@ export function RecipePreviewModal({
               Preview
             </p>
             <h2 className="font-display text-2xl font-medium text-ink">
-              Review before publishing
+              {previewTitle}
             </h2>
           </div>
           <button
@@ -102,7 +106,7 @@ export function RecipePreviewModal({
             disabled={confirming}
             className="rounded-full bg-ink px-6 py-3 text-sm font-medium text-cream hover:bg-clay disabled:opacity-60"
           >
-            {confirming ? "Publishing…" : "Publish fork"}
+            {confirming ? "Submitting…" : confirmLabel}
           </button>
           <button
             type="button"
