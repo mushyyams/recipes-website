@@ -307,3 +307,28 @@ button[class*="PrimaryButton"] {
   font-size: 0.75rem;
   color: var(--recipe-ink-muted);
 }
+
+.recipe-list-editor {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.recipe-list-item {
+  position: relative;
+}
+
+.recipe-list-remove {
+  margin-top: 0.5rem;
+  border: 0;
+  background: transparent;
+  color: var(--recipe-clay);
+  font-size: 0.8125rem;
+  cursor: pointer;
+  font-family: var(--recipe-font-body);
+  padding: 0;
+}
+
+.recipe-list-remove:hover {
+  text-decoration: underline;
+}

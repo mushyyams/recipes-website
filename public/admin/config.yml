@@ -118,28 +118,11 @@ collections:
 
       - label: Ingredients
         name: ingredients
-        widget: list
-        types:
-          - label: Ingredient
-            name: ingredient
-            widget: recipeIngredient
-            summary: "{{amount}} {{unit}} {{item}}"
-          - label: Section
-            name: subheader
-            widget: recipeSection
-            summary: "{{label}}"
+        widget: recipeIngredientsList
 
       - label: The Recipe
         name: steps
-        widget: list
-        types:
-          - label: Step
-            name: step
-            widget: recipeStep
-          - label: Section
-            name: subheader
-            widget: recipeSection
-            summary: "{{label}}"
+        widget: recipeStepsList
 
       - label: Notes & story
         name: body

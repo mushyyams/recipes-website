@@ -516,25 +516,315 @@
     return RecipeTimeControl;
   })(Component);
 
-  CMS.registerWidget("recipeUnit", RecipeUnitControl);
-  CMS.registerWidget("recipeIngredient", RecipeIngredientControl);
-  CMS.registerWidget("recipeSection", RecipeSectionControl);
-  CMS.registerWidget("recipeStep", RecipeStepControl);
-  CMS.registerWidget("recipeNotes", RecipeNotesControl);
-  CMS.registerWidget("recipeTime", RecipeTimeControl);
+  function isIngredientSectionItem(item) {
+    return (
+      item &&
+      typeof item === "object" &&
+      (item.type === "section" || item.type === "subheader")
+    );
+  }
 
-  CMS.registerEventListener({
-    name: "preSave",
-    handler: function (_ref) {
-      var entry = _ref.entry;
+  function normalizeIngredientItem(item) {
+    if (isIngredientSectionItem(item)) {
+      return { type: "section", label: item.label || "" };
+    }
 
-      try {
-        fetch("/api/units/track", { method: "POST" });
-      } catch (_error) {
-        // Non-blocking — save should still proceed
+    if (item && typeof item === "object") {
+      return {
+        amount: String(item.amount || ""),
+        unit: String(item.unit || ""),
+        item: String(item.item || ""),
+      };
+    }
+
+    return { amount: "", unit: "", item: "" };
+  }
+
+  function isStepSectionItem(item) {
+    return (
+      item &&
+      typeof item === "object" &&
+      (item.type === "section" || item.type === "subheader")
+    );
+  }
+
+  function normalizeStepItem(item) {
+    if (typeof item === "string") {
+      return item;
+    }
+
+    if (isStepSectionItem(item)) {
+      return { type: "section", label: item.label || "" };
+    }
+
+    if (item && typeof item === "object") {
+      return String(item.text || item.step || "");
+    }
+
+    return "";
+  }
+
+  function listRemoveButton(onRemove) {
+    return h(
+      "button",
+      {
+        type: "button",
+        className: "recipe-list-remove",
+        onClick: onRemove,
+      },
+      "Remove"
+    );
+  }
+
+  var RecipeIngredientsListControl = (function (Super) {
+    function RecipeIngredientsListControl(props) {
+      Super.call(this, props);
+    }
+
+    if (Super) RecipeIngredientsListControl.__proto__ = Super;
+    RecipeIngredientsListControl.prototype = Object.create(
+      Super && Super.prototype
+    );
+    RecipeIngredientsListControl.prototype.constructor =
+      RecipeIngredientsListControl;
+
+    RecipeIngredientsListControl.prototype.render = function () {
+      var self = this;
+      var items = Array.isArray(this.props.value)
+        ? this.props.value.map(normalizeIngredientItem)
+        : [];
+
+      function updateItems(next) {
+        self.props.onChange(next);
       }
 
-      return entry;
-    },
-  });
+      function updateAt(index, value) {
+        var next = items.slice();
+        next[index] = value;
+        updateItems(next);
+      }
+
+      function removeAt(index) {
+        updateItems(
+          items.filter(function (_, itemIndex) {
+            return itemIndex !== index;
+          })
+        );
+      }
+
+      return h(
+        "div",
+        { className: "recipe-list-editor" },
+        items.length === 0
+          ? h("p", { className: "recipe-notes-empty" }, "No ingredients yet.")
+          : items.map(function (item, index) {
+              if (isIngredientSectionItem(item)) {
+                return h(
+                  "div",
+                  { key: index, className: "recipe-list-item" },
+                  h(RecipeSectionControl, {
+                    value: item,
+                    forID: self.props.forID + "-ing-" + index,
+                    onChange: function (value) {
+                      updateAt(index, value);
+                    },
+                  }),
+                  listRemoveButton(function () {
+                    removeAt(index);
+                  })
+                );
+              }
+
+              return h(
+                "div",
+                { key: index, className: "recipe-list-item" },
+                h(RecipeIngredientControl, {
+                  value: item,
+                  forID: self.props.forID + "-ing-" + index,
+                  onChange: function (value) {
+                    updateAt(index, value);
+                  },
+                }),
+                listRemoveButton(function () {
+                  removeAt(index);
+                })
+              );
+            }),
+        h(
+          "div",
+          { className: "recipe-notes-toolbar" },
+          h(
+            "button",
+            {
+              type: "button",
+              className: "recipe-notes-btn",
+              onClick: function () {
+                updateItems(
+                  items.concat([{ amount: "", unit: "", item: "" }])
+                );
+              },
+            },
+            "+ Ingredient"
+          ),
+          h(
+            "button",
+            {
+              type: "button",
+              className: "recipe-notes-btn",
+              onClick: function () {
+                updateItems(
+                  items.concat([{ type: "section", label: "" }])
+                );
+              },
+            },
+            "+ Section"
+          )
+        )
+      );
+    };
+
+    return RecipeIngredientsListControl;
+  })(Component);
+
+  var RecipeStepsListControl = (function (Super) {
+    function RecipeStepsListControl(props) {
+      Super.call(this, props);
+    }
+
+    if (Super) RecipeStepsListControl.__proto__ = Super;
+    RecipeStepsListControl.prototype = Object.create(Super && Super.prototype);
+    RecipeStepsListControl.prototype.constructor = RecipeStepsListControl;
+
+    RecipeStepsListControl.prototype.render = function () {
+      var self = this;
+      var items = Array.isArray(this.props.value)
+        ? this.props.value.map(normalizeStepItem)
+        : [];
+
+      function updateItems(next) {
+        self.props.onChange(next);
+      }
+
+      function updateAt(index, value) {
+        var next = items.slice();
+        next[index] = value;
+        updateItems(next);
+      }
+
+      function removeAt(index) {
+        updateItems(
+          items.filter(function (_, itemIndex) {
+            return itemIndex !== index;
+          })
+        );
+      }
+
+      return h(
+        "div",
+        { className: "recipe-list-editor" },
+        items.length === 0
+          ? h("p", { className: "recipe-notes-empty" }, "No steps yet.")
+          : items.map(function (item, index) {
+              if (isStepSectionItem(item)) {
+                return h(
+                  "div",
+                  { key: index, className: "recipe-list-item" },
+                  h(RecipeSectionControl, {
+                    value: item,
+                    forID: self.props.forID + "-step-" + index,
+                    onChange: function (value) {
+                      updateAt(index, value);
+                    },
+                  }),
+                  listRemoveButton(function () {
+                    removeAt(index);
+                  })
+                );
+              }
+
+              return h(
+                "div",
+                { key: index, className: "recipe-list-item" },
+                h(RecipeStepControl, {
+                  value: item,
+                  forID: self.props.forID + "-step-" + index,
+                  onChange: function (value) {
+                    updateAt(index, value);
+                  },
+                }),
+                listRemoveButton(function () {
+                  removeAt(index);
+                })
+              );
+            }),
+        h(
+          "div",
+          { className: "recipe-notes-toolbar" },
+          h(
+            "button",
+            {
+              type: "button",
+              className: "recipe-notes-btn",
+              onClick: function () {
+                updateItems(items.concat([""]));
+              },
+            },
+            "+ Step"
+          ),
+          h(
+            "button",
+            {
+              type: "button",
+              className: "recipe-notes-btn",
+              onClick: function () {
+                updateItems(
+                  items.concat([{ type: "section", label: "" }])
+                );
+              },
+            },
+            "+ Section"
+          )
+        )
+      );
+    };
+
+    return RecipeStepsListControl;
+  })(Component);
+
+  function registerRecipeWidgets() {
+    CMS.registerWidget("recipeUnit", RecipeUnitControl);
+    CMS.registerWidget("recipeIngredient", RecipeIngredientControl);
+    CMS.registerWidget("recipeSection", RecipeSectionControl);
+    CMS.registerWidget("recipeStep", RecipeStepControl);
+    CMS.registerWidget("recipeNotes", RecipeNotesControl);
+    CMS.registerWidget("recipeTime", RecipeTimeControl);
+    CMS.registerWidget("recipeIngredientsList", RecipeIngredientsListControl);
+    CMS.registerWidget("recipeStepsList", RecipeStepsListControl);
+
+    CMS.registerEventListener({
+      name: "preSave",
+      handler: function (_ref) {
+        var entry = _ref.entry;
+
+        try {
+          fetch("/api/units/track", { method: "POST" });
+        } catch (_error) {
+          // Non-blocking — save should still proceed
+        }
+
+        return entry;
+      },
+    });
+  }
+
+  function initRecipeCms() {
+    if (!window.CMS) {
+      window.setTimeout(initRecipeCms, 50);
+      return;
+    }
+
+    registerRecipeWidgets();
+  }
+
+  initRecipeCms();
 })();
