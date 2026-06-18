@@ -1,3 +1,5 @@
+import { ingredientsToDisplayStrings } from "@/lib/ingredients";
+import { getMethodSteps } from "@/lib/steps";
 import type { Recipe } from "@/lib/recipes";
 import type { RatingSummary } from "@/lib/ratings";
 import { absoluteUrl, siteConfig } from "@/lib/site";
@@ -55,8 +57,8 @@ export function buildRecipeJsonLd(recipe: Recipe, options: RecipeJsonLdOptions =
     recipeYield: `${recipe.servings} servings`,
     recipeCategory: recipe.category,
     keywords: recipe.tags.join(", "),
-    recipeIngredient: recipe.ingredients,
-    recipeInstructions: recipe.steps.map((text, index) => ({
+    recipeIngredient: ingredientsToDisplayStrings(recipe.ingredients),
+    recipeInstructions: getMethodSteps(recipe.steps).map((text, index) => ({
       "@type": "HowToStep",
       position: index + 1,
       text,

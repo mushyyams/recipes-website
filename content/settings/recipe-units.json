@@ -1,0 +1,22 @@
+{
+  "fixedUnits": [
+    "tsp",
+    "tbsp",
+    "cup",
+    "oz",
+    "lb",
+    "g",
+    "kg",
+    "ml",
+    "l",
+    "clove",
+    "pinch",
+    "can",
+    "packet",
+    "bunch",
+    "sprig",
+    "slice",
+    "fillet"
+  ],
+  "customUnitUsage": {}
+}

@@ -1,14 +1,16 @@
 "use client";
 
 import { useState } from "react";
+import { IngredientSubheader } from "@/components/IngredientSubheader";
+import {
+  formatIngredient,
+  isIngredientSection,
+  type RecipeIngredientLine,
+} from "@/lib/ingredients";
 
 type IngredientListProps = {
-  ingredients: string[];
+  ingredients: RecipeIngredientLine[];
 };
-
-function isSectionHeader(item: string): boolean {
-  return / Ingredients$|^Fixings$|^Salt and Oil$/.test(item.trim());
-}
 
 export function IngredientList({ ingredients }: IngredientListProps) {
   const [checked, setChecked] = useState<Set<number>>(() => new Set());
@@ -29,37 +31,35 @@ export function IngredientList({ ingredients }: IngredientListProps) {
     <div className="rounded-[1.5rem] bg-parchment p-6 md:p-8">
       <h2 className="font-display text-xl font-medium text-ink">Ingredients</h2>
       <ul className="mt-5 space-y-3">
-        {ingredients.map((item, index) => {
-          if (isSectionHeader(item)) {
+        {ingredients.map((line, index) => {
+          if (isIngredientSection(line)) {
             return (
-              <li key={`${index}-${item}`} className="pt-2 first:pt-0">
-                <p className="text-xs font-medium uppercase tracking-[0.12em] text-ink">
-                  {item}
-                </p>
+              <li key={`${index}-section`} className="list-none">
+                <IngredientSubheader label={line.label} />
               </li>
             );
           }
 
-          const isChecked = checked.has(index);
+          const label = formatIngredient(line);
 
           return (
-            <li key={`${index}-${item}`}>
+            <li key={`${index}-${label}`}>
               <label className="group flex cursor-pointer items-start gap-3 text-sm leading-relaxed">
                 <input
                   type="checkbox"
-                  checked={isChecked}
+                  checked={checked.has(index)}
                   onChange={() => toggle(index)}
                   className="peer sr-only"
                 />
                 <span
                   aria-hidden
                   className={`mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded border transition-colors peer-focus-visible:ring-2 peer-focus-visible:ring-clay/40 ${
-                    isChecked
+                    checked.has(index)
                       ? "border-clay bg-clay"
                       : "border-stone-dark bg-cream"
                   }`}
                 >
-                  {isChecked ? (
+                  {checked.has(index) ? (
                     <svg
                       className="h-2.5 w-2.5 text-cream"
                       viewBox="0 0 12 12"
@@ -75,12 +75,12 @@ export function IngredientList({ ingredients }: IngredientListProps) {
                 </span>
                 <span
                   className={
-                    isChecked
+                    checked.has(index)
                       ? "text-ink-muted/70 line-through decoration-ink-muted/50 transition-colors"
                       : "text-ink-muted transition-colors group-hover:text-ink"
                   }
                 >
-                  {item}
+                  {label}
                 </span>
               </label>
             </li>

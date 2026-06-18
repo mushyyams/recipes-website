@@ -17,16 +17,33 @@ image: /images/recipes/img_0199.jpeg
 imageAlt: Fresh flatbread stacked on a plate
 video: https://www.tiktok.com/@mushyyams/video/7243162469798071598
 ingredients:
-  - Dry Ingredients
-  - 250g flour (1 half-quart container of loosely packed flour)
-  - 7g instant dry yeast (one packet)
-  - 5g sugar (1 1/4 tsp)
-  - Wet Ingredients
-  - 160 ml milk (1/2 of a half-quart container)
-  - Salt and Oil
-  - 4g salt (1 1/4 tsp)
-  - 9g olive oil (2 tsp)
-  - 1 bunch green onion (optional)
+  - type: section
+    label: Dry Ingredients
+  - amount: "250"
+    unit: g
+    item: flour (1 half-quart container of loosely packed flour)
+  - amount: "7"
+    unit: g
+    item: instant dry yeast (one packet)
+  - amount: "5"
+    unit: g
+    item: sugar (1 1/4 tsp)
+  - type: section
+    label: Wet Ingredients
+  - amount: "160"
+    unit: ml
+    item: milk (1/2 of a half-quart container)
+  - type: section
+    label: Salt and Oil
+  - amount: "4"
+    unit: g
+    item: salt (1 1/4 tsp)
+  - amount: "9"
+    unit: g
+    item: olive oil (2 tsp)
+  - amount: "1"
+    unit: bunch
+    item: green onion (optional)
 steps:
   - Mix the dry ingredients in a bowl.
   - Add the wet ingredients and mix roughly until a shaggy dough forms. Let it

@@ -1,6 +1,9 @@
 import fs from "fs";
 import path from "path";
 import matter from "gray-matter";
+import { normalizeIngredients, type RecipeIngredientLine } from "@/lib/ingredients";
+import { normalizeRecipeTimeField } from "@/lib/recipe-time";
+import { normalizeSteps, type RecipeStepLine } from "@/lib/steps";
 
 const RECIPES_DIR = path.join(process.cwd(), "content/recipes");
 
@@ -19,8 +22,8 @@ export type RecipeMeta = {
   image: string;
   imageAlt: string;
   video?: string;
-  ingredients: string[];
-  steps: string[];
+  ingredients: RecipeIngredientLine[];
+  steps: RecipeStepLine[];
 };
 
 export type Recipe = RecipeMeta & {
@@ -38,8 +41,8 @@ function parseRecipeFile(filename: string): Recipe {
     excerpt: data.excerpt,
     category: data.category,
     tags: data.tags ?? [],
-    prepTime: data.prepTime,
-    cookTime: data.cookTime,
+    prepTime: normalizeRecipeTimeField(data.prepTime),
+    cookTime: normalizeRecipeTimeField(data.cookTime),
     servings: data.servings,
     difficulty: data.difficulty,
     featured: data.featured ?? false,
@@ -47,8 +50,8 @@ function parseRecipeFile(filename: string): Recipe {
     image: data.image,
     imageAlt: data.imageAlt,
     video: data.video || undefined,
-    ingredients: data.ingredients ?? [],
-    steps: data.steps ?? [],
+    ingredients: normalizeIngredients(data.ingredients ?? []),
+    steps: normalizeSteps(data.steps ?? []),
     content,
   };
 }

@@ -1,5 +1,17 @@
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { createClient } from "@supabase/supabase-js";
+import {
+  getIngredientItems,
+  isIngredientSection,
+  normalizeIngredients,
+  type RecipeIngredientLine,
+} from "@/lib/ingredients";
+import {
+  getMethodSteps,
+  isMethodSection,
+  normalizeSteps,
+  type RecipeStepLine,
+} from "@/lib/steps";
 
 export type RecipeFork = {
   id: string;
@@ -8,8 +20,8 @@ export type RecipeFork = {
   userId: string | null;
   title: string;
   excerpt: string;
-  ingredients: string[];
-  steps: string[];
+  ingredients: RecipeIngredientLine[];
+  steps: RecipeStepLine[];
   content: string;
   prepTime: string | null;
   cookTime: string | null;
@@ -24,14 +36,28 @@ type ForkRow = {
   user_id: string | null;
   title: string;
   excerpt: string;
-  ingredients: string[];
-  steps: string[];
+  ingredients: unknown;
+  steps: unknown;
   content: string;
   prep_time: string | null;
   cook_time: string | null;
   servings: number | null;
   created_at: string;
 };
+
+function parseForkIngredients(raw: unknown): RecipeIngredientLine[] {
+  if (Array.isArray(raw)) {
+    return normalizeIngredients(raw);
+  }
+  return [];
+}
+
+function parseForkSteps(raw: unknown): RecipeStepLine[] {
+  if (Array.isArray(raw)) {
+    return normalizeSteps(raw);
+  }
+  return [];
+}
 
 function mapFork(row: ForkRow): RecipeFork {
   return {
@@ -41,8 +67,8 @@ function mapFork(row: ForkRow): RecipeFork {
     userId: row.user_id,
     title: row.title,
     excerpt: row.excerpt,
-    ingredients: row.ingredients ?? [],
-    steps: row.steps ?? [],
+    ingredients: parseForkIngredients(row.ingredients),
+    steps: parseForkSteps(row.steps),
     content: row.content ?? "",
     prepTime: row.prep_time,
     cookTime: row.cook_time,
@@ -117,8 +143,8 @@ export type CreateForkInput = {
   authorName: string;
   title: string;
   excerpt: string;
-  ingredients: string[];
-  steps: string[];
+  ingredients: RecipeIngredientLine[];
+  steps: RecipeStepLine[];
   content: string;
   prepTime?: string;
   cookTime?: string;
@@ -136,6 +162,12 @@ export async function createFork(
   const authorName = input.authorName.trim();
   const title = input.title.trim();
   const excerpt = input.excerpt.trim();
+  const lines = input.ingredients.filter((entry) => {
+    if (isIngredientSection(entry)) {
+      return entry.label.trim();
+    }
+    return entry.item.trim() || entry.amount.trim() || entry.unit.trim();
+  });
 
   if (!authorName || authorName.length > 80) {
     return { error: "Please enter your name (80 characters max)." };
@@ -146,7 +178,14 @@ export async function createFork(
   if (!excerpt || excerpt.length > 500) {
     return { error: "Please add a short description of your variation." };
   }
-  if (input.ingredients.length === 0 || input.steps.length === 0) {
+  const stepLines = input.steps.filter((entry) => {
+    if (isMethodSection(entry)) {
+      return entry.label.trim();
+    }
+    return typeof entry === "string" && entry.trim();
+  });
+
+  if (getIngredientItems(lines).length === 0 || getMethodSteps(stepLines).length === 0) {
     return { error: "Add at least one ingredient and one step." };
   }
 
@@ -157,8 +196,8 @@ export async function createFork(
       author_name: authorName,
       title,
       excerpt,
-      ingredients: input.ingredients,
-      steps: input.steps,
+      ingredients: lines,
+      steps: stepLines,
       content: input.content.trim(),
       prep_time: input.prepTime ?? null,
       cook_time: input.cookTime ?? null,
@@ -216,4 +255,3 @@ export async function deleteForkById(
 
   return { success: true };
 }
-

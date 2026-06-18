@@ -1,10 +1,15 @@
+import { getIngredientItems, type RecipeIngredientLine } from "@/lib/ingredients";
+import { getMethodSteps, type RecipeStepLine } from "@/lib/steps";
+
 export function summarizeForkChanges(
-  original: { ingredients: string[]; steps: string[] },
-  fork: { ingredients: string[]; steps: string[] }
+  original: { ingredients: RecipeIngredientLine[]; steps: RecipeStepLine[] },
+  fork: { ingredients: RecipeIngredientLine[]; steps: RecipeStepLine[] }
 ): string {
   const ingredientDelta =
-    fork.ingredients.length - original.ingredients.length;
-  const stepDelta = fork.steps.length - original.steps.length;
+    getIngredientItems(fork.ingredients).length -
+    getIngredientItems(original.ingredients).length;
+  const stepDelta =
+    getMethodSteps(fork.steps).length - getMethodSteps(original.steps).length;
   const parts: string[] = [];
 
   if (ingredientDelta !== 0) {

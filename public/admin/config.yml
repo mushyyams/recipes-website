@@ -13,6 +13,8 @@ public_folder: /images/recipes
 
 locale: en
 
+preview_path: recipes/{{slug}}
+
 collections:
   - name: recipes
     label: Recipes
@@ -28,15 +30,19 @@ collections:
       - label: Title
         name: title
         widget: string
+        hint: The name of your recipe as it appears on the site
+
       - label: URL slug
         name: slug
         widget: string
-        hint: Lowercase with hyphens, e.g. honey-garlic-salmon
+        hint: Auto-generated from title — lowercase with hyphens, e.g. honey-garlic-salmon
         pattern: ['^[a-z0-9]+(?:-[a-z0-9]+)*$', 'Use lowercase letters, numbers, and hyphens only']
+
       - label: Excerpt
         name: excerpt
         widget: text
         hint: One compelling sentence for cards and search results
+
       - label: Category
         name: category
         widget: select
@@ -48,6 +54,7 @@ collections:
           - Pasta
           - Dessert
           - Drinks
+
       - label: Tags
         name: tags
         widget: list
@@ -56,19 +63,23 @@ collections:
           label: Tag
           name: tag
           widget: string
+
       - label: Prep time
         name: prepTime
-        widget: string
+        widget: recipeTime
         default: "10 min"
+
       - label: Cook time
         name: cookTime
-        widget: string
+        widget: recipeTime
         default: "20 min"
+
       - label: Servings
         name: servings
         widget: number
         value_type: int
         min: 1
+
       - label: Difficulty
         name: difficulty
         widget: select
@@ -76,43 +87,89 @@ collections:
           - Easy
           - Medium
           - Advanced
+
       - label: Featured on homepage
         name: featured
         widget: boolean
         default: false
+
       - label: Published date
         name: publishedAt
         widget: datetime
         date_format: YYYY-MM-DD
         time_format: false
         default: ""
+
       - label: Hero image
         name: image
         widget: image
         allow_multiple: false
+
       - label: Image alt text
         name: imageAlt
         widget: string
+
       - label: TikTok video URL
         name: video
         widget: string
         required: false
         hint: Full TikTok link for this recipe (used in SEO and the sidebar CTA)
+
       - label: Ingredients
         name: ingredients
         widget: list
-        field:
-          label: Ingredient
-          name: ingredient
-          widget: string
-      - label: Method steps
+        types:
+          - label: Ingredient
+            name: ingredient
+            widget: object
+            summary: "{{fields.amount}} {{fields.unit}} {{fields.item}}"
+            fields:
+              - label: Amount
+                name: amount
+                widget: string
+                required: false
+                hint: e.g. 2, ½, 1-2
+              - label: Unit
+                name: unit
+                widget: recipeUnit
+                required: false
+              - label: Ingredient
+                name: item
+                widget: string
+                hint: e.g. unsalted butter, finely grated
+          - label: Section
+            name: subheader
+            widget: object
+            summary: "{{fields.label}}"
+            fields:
+              - label: Label
+                name: label
+                widget: string
+                hint: e.g. For the marinade, To serve
+
+      - label: The Recipe
         name: steps
         widget: list
-        field:
-          label: Step
-          name: step
-          widget: text
-      - label: Article body
+        types:
+          - label: Step
+            name: step
+            widget: object
+            summary: "{{fields.text}}"
+            fields:
+              - label: Instruction
+                name: text
+                widget: text
+          - label: Section
+            name: subheader
+            widget: object
+            summary: "{{fields.label}}"
+            fields:
+              - label: Label
+                name: label
+                widget: string
+                hint: e.g. For the sauce, To serve
+
+      - label: Notes & story
         name: body
         widget: markdown
-        hint: Editorial notes, TikTok context, substitutions, and extra technique
+        hint: Optional — editorial notes, TikTok context, substitutions, and extra technique (not cooking steps)

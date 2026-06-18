@@ -1,4 +1,7 @@
 import { NextResponse } from "next/server";
+import { normalizeIngredients } from "@/lib/ingredients";
+import { recalculateCustomUnitUsage } from "@/lib/recipe-unit-sync";
+import { normalizeSteps } from "@/lib/steps";
 import { createFork, getForksForRecipe } from "@/lib/forks";
 
 export async function GET(request: Request) {
@@ -30,8 +33,8 @@ export async function POST(request: Request) {
     authorName?: string;
     title?: string;
     excerpt?: string;
-    ingredients?: string[];
-    steps?: string[];
+    ingredients?: unknown[];
+    steps?: unknown[];
     content?: string;
     prepTime?: string;
     cookTime?: string;
@@ -50,8 +53,8 @@ export async function POST(request: Request) {
     authorName: input.authorName ?? "",
     title: input.title ?? "",
     excerpt: input.excerpt ?? "",
-    ingredients: (input.ingredients ?? []).map((s) => s.trim()).filter(Boolean),
-    steps: (input.steps ?? []).map((s) => s.trim()).filter(Boolean),
+    ingredients: normalizeIngredients(input.ingredients ?? []),
+    steps: normalizeSteps(input.steps ?? []),
     content: input.content ?? "",
     prepTime: input.prepTime,
     cookTime: input.cookTime,
@@ -61,6 +64,8 @@ export async function POST(request: Request) {
   if (result.error) {
     return NextResponse.json({ error: result.error }, { status: 400 });
   }
+
+  await recalculateCustomUnitUsage();
 
   return NextResponse.json({ fork: result.fork }, { status: 201 });
 }

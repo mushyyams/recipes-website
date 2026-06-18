@@ -117,12 +117,20 @@ export function ForkModerationAdmin() {
   if (!secret) {
     return (
       <div className="mx-auto max-w-md px-6 py-24">
-        <Link
-          href="/admin"
-          className="text-sm font-medium text-clay hover:underline"
-        >
-          ← Back to CMS
-        </Link>
+        <div className="flex flex-wrap gap-x-4 gap-y-1">
+          <Link
+            href="/admin/units"
+            className="text-sm font-medium text-clay hover:underline"
+          >
+            Manage units →
+          </Link>
+          <Link
+            href="/admin"
+            className="text-sm font-medium text-clay hover:underline"
+          >
+            ← Back to CMS
+          </Link>
+        </div>
         <h1 className="mt-8 font-display text-3xl font-medium text-ink">
           Moderate forks
         </h1>
@@ -152,12 +160,20 @@ export function ForkModerationAdmin() {
     <div className="mx-auto max-w-4xl px-6 py-16 lg:py-24">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
-          <Link
-            href="/admin"
-            className="text-sm font-medium text-clay hover:underline"
-          >
-            ← Back to CMS
-          </Link>
+          <div className="flex flex-wrap gap-x-4 gap-y-1">
+            <Link
+              href="/admin/units"
+              className="text-sm font-medium text-clay hover:underline"
+            >
+              Manage units →
+            </Link>
+            <Link
+              href="/admin"
+              className="text-sm font-medium text-clay hover:underline"
+            >
+              ← Back to CMS
+            </Link>
+          </div>
           <h1 className="mt-4 font-display text-3xl font-medium text-ink">
             Community forks
           </h1>
