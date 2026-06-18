@@ -43,6 +43,16 @@ export function Header() {
               </Link>
             );
           })}
+          <Link
+            href="/admin"
+            className={`rounded-full px-4 py-2 text-sm transition-colors ${
+              pathname.startsWith("/admin")
+                ? "bg-parchment text-ink"
+                : "text-ink-muted hover:bg-parchment hover:text-ink"
+            }`}
+          >
+            Add a recipe
+          </Link>
           <a
             href={siteConfig.social.tiktok}
             target="_blank"

@@ -121,31 +121,12 @@ collections:
         types:
           - label: Ingredient
             name: ingredient
-            widget: object
-            summary: "{{fields.amount}} {{fields.unit}} {{fields.item}}"
-            fields:
-              - label: Amount
-                name: amount
-                widget: string
-                required: false
-                hint: e.g. 2, ½, 1-2
-              - label: Unit
-                name: unit
-                widget: recipeUnit
-                required: false
-              - label: Ingredient
-                name: item
-                widget: string
-                hint: e.g. unsalted butter, finely grated
+            widget: recipeIngredient
+            summary: "{{amount}} {{unit}} {{item}}"
           - label: Section
             name: subheader
-            widget: object
-            summary: "{{fields.label}}"
-            fields:
-              - label: Label
-                name: label
-                widget: string
-                hint: e.g. For the marinade, To serve
+            widget: recipeSection
+            summary: "{{label}}"
 
       - label: The Recipe
         name: steps
@@ -153,23 +134,12 @@ collections:
         types:
           - label: Step
             name: step
-            widget: object
-            summary: "{{fields.text}}"
-            fields:
-              - label: Instruction
-                name: text
-                widget: text
+            widget: recipeStep
           - label: Section
             name: subheader
-            widget: object
-            summary: "{{fields.label}}"
-            fields:
-              - label: Label
-                name: label
-                widget: string
-                hint: e.g. For the sauce, To serve
+            widget: recipeSection
+            summary: "{{label}}"
 
       - label: Notes & story
         name: body
-        widget: markdown
-        hint: Optional — editorial notes, TikTok context, substitutions, and extra technique (not cooking steps)
+        widget: recipeNotes

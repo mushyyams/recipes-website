@@ -1,0 +1,309 @@
+@import url("https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=Fraunces:opsz,wght@9..144,500;9..144,600&display=swap");
+
+:root {
+  --recipe-cream: #faf7f2;
+  --recipe-parchment: #f5f0e8;
+  --recipe-ink: #1c1b19;
+  --recipe-ink-muted: #5c5852;
+  --recipe-clay: #b85c38;
+  --recipe-sage: #6b7f64;
+  --recipe-stone: #e8e2d8;
+  --recipe-stone-dark: #d4cdc0;
+  --recipe-radius: 1rem;
+  --recipe-radius-lg: 1.5rem;
+  --recipe-font-body: "DM Sans", system-ui, sans-serif;
+  --recipe-font-display: "Fraunces", Georgia, serif;
+}
+
+html,
+body {
+  background: var(--recipe-cream) !important;
+  color: var(--recipe-ink) !important;
+  font-family: var(--recipe-font-body) !important;
+}
+
+/* Decap shell */
+[class*="AppMainContainer"],
+[class*="EditorContainer"],
+[class*="ScrollContainer"],
+[class*="ControlPane"],
+[class*="EditorControl"] {
+  background: var(--recipe-cream) !important;
+}
+
+[class*="AppHeader"],
+[class*="ToolbarContainer"] {
+  background: var(--recipe-parchment) !important;
+  border-bottom: 1px solid var(--recipe-stone) !important;
+}
+
+[class*="AppHeader"] h1,
+[class*="CollectionTop"] h1,
+[class*="EditorPage"] h1 {
+  font-family: var(--recipe-font-display) !important;
+  font-weight: 500 !important;
+  color: var(--recipe-ink) !important;
+}
+
+/* Field labels */
+[class*="WidgetLabel"],
+[class*="FieldLabel"],
+label[class*="Label"] {
+  font-size: 0.6875rem !important;
+  font-weight: 500 !important;
+  letter-spacing: 0.15em !important;
+  text-transform: uppercase !important;
+  color: var(--recipe-sage) !important;
+}
+
+[class*="ControlHint"],
+[class*="FieldHint"] {
+  color: var(--recipe-ink-muted) !important;
+  font-size: 0.8125rem !important;
+  line-height: 1.5 !important;
+}
+
+/* Inputs */
+input[type="text"],
+input[type="number"],
+input[type="url"],
+input[type="email"],
+input[type="search"],
+textarea,
+select,
+[class*="ControlInput"] {
+  border-radius: var(--recipe-radius) !important;
+  border: 1px solid var(--recipe-stone) !important;
+  background: var(--recipe-cream) !important;
+  color: var(--recipe-ink) !important;
+  font-family: var(--recipe-font-body) !important;
+  font-size: 0.875rem !important;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  border-color: var(--recipe-sage) !important;
+  outline: none !important;
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--recipe-sage) 20%, transparent) !important;
+}
+
+/* List items → cards */
+[class*="ListItem"],
+[class*="NestedObjectContainer"] {
+  background: color-mix(in srgb, var(--recipe-parchment) 60%, white) !important;
+  border: 1px solid var(--recipe-stone) !important;
+  border-radius: var(--recipe-radius-lg) !important;
+  padding: 1rem !important;
+  margin-bottom: 0.75rem !important;
+}
+
+[class*="ListItemHeader"],
+[class*="ListItemMeta"] {
+  font-family: var(--recipe-font-display) !important;
+  color: var(--recipe-ink) !important;
+}
+
+/* Buttons */
+button[class*="Button"],
+[class*="ToolbarButton"],
+a[class*="Button"] {
+  border-radius: 9999px !important;
+  font-family: var(--recipe-font-body) !important;
+  font-size: 0.875rem !important;
+}
+
+[class*="Button"][class*="Primary"],
+button[class*="PrimaryButton"] {
+  background: var(--recipe-ink) !important;
+  color: var(--recipe-cream) !important;
+}
+
+/* --- Custom recipe widgets --- */
+
+.recipe-field-label {
+  display: block;
+  margin-bottom: 0.25rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--recipe-ink-muted);
+}
+
+.recipe-input,
+.recipe-textarea {
+  width: 100%;
+  box-sizing: border-box;
+  border-radius: var(--recipe-radius);
+  border: 1px solid var(--recipe-stone);
+  background: var(--recipe-cream);
+  color: var(--recipe-ink);
+  padding: 0.5rem 0.75rem;
+  font-family: var(--recipe-font-body);
+  font-size: 0.875rem;
+}
+
+.recipe-input:focus,
+.recipe-textarea:focus {
+  border-color: var(--recipe-sage);
+  outline: none;
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--recipe-sage) 20%, transparent);
+}
+
+.recipe-textarea {
+  min-height: 6rem;
+  resize: vertical;
+  line-height: 1.6;
+}
+
+.recipe-card {
+  background: color-mix(in srgb, var(--recipe-parchment) 60%, white);
+  border: 1px solid var(--recipe-stone);
+  border-radius: var(--recipe-radius-lg);
+  padding: 1rem;
+}
+
+.recipe-ingredient-grid {
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: minmax(0, 5rem) minmax(0, 7.5rem) 1fr;
+}
+
+@media (max-width: 640px) {
+  .recipe-ingredient-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.recipe-section-divider {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.25rem 0;
+}
+
+.recipe-section-line {
+  flex: 1;
+  height: 1px;
+  background: color-mix(in srgb, var(--recipe-stone-dark) 50%, transparent);
+}
+
+.recipe-section-input {
+  min-width: 0;
+  flex: 1;
+  border: 0;
+  background: transparent;
+  text-align: center;
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--recipe-sage);
+  padding: 0.25rem 0.5rem;
+}
+
+.recipe-section-input::placeholder {
+  color: color-mix(in srgb, var(--recipe-sage) 40%, transparent);
+}
+
+.recipe-section-input:focus {
+  outline: none;
+}
+
+.recipe-header-input {
+  width: 100%;
+  border: 0;
+  background: transparent;
+  font-family: var(--recipe-font-display);
+  font-size: 1.625rem;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  color: var(--recipe-ink);
+  padding: 0.25rem 0;
+}
+
+.recipe-header-input::placeholder {
+  color: color-mix(in srgb, var(--recipe-ink) 30%, transparent);
+}
+
+.recipe-header-input:focus {
+  outline: none;
+}
+
+.recipe-unit-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  margin-top: 0.5rem;
+}
+
+.recipe-unit-chip {
+  border-radius: 9999px;
+  padding: 0.125rem 0.5rem;
+  font-size: 0.75rem;
+  border: 1px solid var(--recipe-stone);
+  background: transparent;
+  color: var(--recipe-ink-muted);
+  cursor: pointer;
+  font-family: var(--recipe-font-body);
+}
+
+.recipe-unit-chip:hover {
+  border-color: var(--recipe-sage);
+  color: var(--recipe-sage);
+}
+
+.recipe-unit-chip.is-selected {
+  border-color: var(--recipe-sage);
+  background: var(--recipe-sage);
+  color: var(--recipe-cream);
+}
+
+.recipe-notes-block {
+  margin-bottom: 0.75rem;
+}
+
+.recipe-notes-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+
+.recipe-notes-btn {
+  border-radius: 9999px;
+  border: 1px solid var(--recipe-stone);
+  background: transparent;
+  color: var(--recipe-ink);
+  padding: 0.375rem 1rem;
+  font-size: 0.875rem;
+  cursor: pointer;
+  font-family: var(--recipe-font-body);
+}
+
+.recipe-notes-btn:hover {
+  border-color: var(--recipe-sage);
+  color: var(--recipe-sage);
+}
+
+.recipe-notes-empty {
+  font-size: 0.875rem;
+  color: var(--recipe-ink-muted);
+  margin: 0 0 0.75rem;
+}
+
+.recipe-time-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.recipe-time-input {
+  width: 4rem;
+  flex-shrink: 0;
+}
+
+.recipe-time-suffix {
+  font-size: 0.75rem;
+  color: var(--recipe-ink-muted);
+}

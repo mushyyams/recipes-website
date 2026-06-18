@@ -57,6 +57,12 @@ export default async function HomePage() {
               >
                 Browse all recipes
               </Link>
+              <Link
+                href="/admin"
+                className="rounded-full border border-stone-dark px-6 py-3 text-sm font-medium text-ink transition-colors hover:border-sage hover:text-sage"
+              >
+                Add a recipe
+              </Link>
               <a
                 href={siteConfig.social.tiktok}
                 target="_blank"

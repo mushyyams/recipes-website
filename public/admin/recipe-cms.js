@@ -1,5 +1,4 @@
 (function () {
-  var OTHER = "__other__";
   var createElement = window.React.createElement;
   var h = createElement;
   var Component = window.React.Component;
@@ -18,6 +17,44 @@
   }
 
   var QUICK_PICK_UNITS = ["tsp", "tbsp", "cup", "g", "oz", "ml"];
+
+  function fieldLabel(text) {
+    return h("span", { className: "recipe-field-label" }, text);
+  }
+
+  function parseNotesMarkdown(markdown) {
+    var trimmed = (markdown || "").trim();
+    if (!trimmed) return [];
+
+    return trimmed.split(/\n\n+/).map(function (chunk) {
+      var lines = chunk.split("\n");
+      var firstLine = lines[0] || "";
+
+      if (/^###\s+/.test(firstLine) && lines.length === 1) {
+        return { type: "section", text: firstLine.replace(/^###\s+/, "") };
+      }
+
+      if (/^##\s+/.test(firstLine) && lines.length === 1) {
+        return { type: "header", text: firstLine.replace(/^##\s+/, "") };
+      }
+
+      return { type: "paragraph", text: chunk };
+    });
+  }
+
+  function serializeNotesMarkdown(blocks) {
+    return blocks
+      .filter(function (block) {
+        return block.text && block.text.trim();
+      })
+      .map(function (block) {
+        if (block.type === "header") return "## " + block.text.trim();
+        if (block.type === "section") return "### " + block.text.trim();
+        return block.text.trim();
+      })
+      .join("\n\n")
+      .trim();
+  }
 
   var RecipeUnitControl = (function (Super) {
     function RecipeUnitControl(props) {
@@ -51,7 +88,7 @@
         h("input", {
           type: "text",
           list: listId,
-          className: self.props.classNameWrapper,
+          className: "recipe-input",
           id: self.props.forID,
           value: value,
           placeholder: "tsp, cup, g…",
@@ -72,7 +109,7 @@
         quickPicks.length
           ? h(
               "div",
-              { style: { display: "flex", flexWrap: "wrap", gap: "0.25rem", marginTop: "0.5rem" } },
+              { className: "recipe-unit-chips" },
               quickPicks.map(function (unit) {
                 var selected = value.trim().toLowerCase() === unit;
                 return h(
@@ -80,17 +117,9 @@
                   {
                     key: unit,
                     type: "button",
+                    className: "recipe-unit-chip" + (selected ? " is-selected" : ""),
                     onClick: function () {
                       self.props.onChange(unit);
-                    },
-                    style: {
-                      borderRadius: "9999px",
-                      padding: "0.125rem 0.5rem",
-                      fontSize: "0.75rem",
-                      border: selected ? "none" : "1px solid #d6cfc4",
-                      background: selected ? "#7a8f6e" : "transparent",
-                      color: selected ? "#faf7f2" : "#6b6560",
-                      cursor: "pointer",
                     },
                   },
                   unit
@@ -104,7 +133,303 @@
     return RecipeUnitControl;
   })(Component);
 
-  CMS.registerWidget("recipeUnit", RecipeUnitControl);
+  var RecipeIngredientControl = (function (Super) {
+    function RecipeIngredientControl(props) {
+      Super.call(this, props);
+      this.state = { fixedUnits: [] };
+    }
+
+    if (Super) RecipeIngredientControl.__proto__ = Super;
+    RecipeIngredientControl.prototype = Object.create(Super && Super.prototype);
+    RecipeIngredientControl.prototype.constructor = RecipeIngredientControl;
+
+    RecipeIngredientControl.prototype.componentDidMount = function () {
+      var self = this;
+      fetchFixedUnits().then(function (fixedUnits) {
+        self.setState({ fixedUnits: fixedUnits });
+      });
+    };
+
+    RecipeIngredientControl.prototype.render = function () {
+      var self = this;
+      var value = this.props.value || { amount: "", unit: "", item: "" };
+      var fixedUnits = this.state.fixedUnits;
+      var listId = "recipe-ingredient-unit-" + this.props.forID;
+
+      function update(patch) {
+        self.props.onChange(Object.assign({}, value, patch));
+      }
+
+      return h(
+        "div",
+        { className: "recipe-card" },
+        h(
+          "div",
+          { className: "recipe-ingredient-grid" },
+          h(
+            "div",
+            null,
+            fieldLabel("Amount"),
+            h("input", {
+              className: "recipe-input",
+              value: value.amount || "",
+              placeholder: "2",
+              onChange: function (event) {
+                update({ amount: event.target.value });
+              },
+            })
+          ),
+          h(
+            "div",
+            null,
+            fieldLabel("Unit"),
+            h("input", {
+              type: "text",
+              list: listId,
+              className: "recipe-input",
+              value: value.unit || "",
+              placeholder: "tsp, cup, g…",
+              onChange: function (event) {
+                update({ unit: event.target.value });
+              },
+              onBlur: function (event) {
+                update({ unit: event.target.value.trim().toLowerCase() });
+              },
+            }),
+            h(
+              "datalist",
+              { id: listId },
+              fixedUnits.map(function (unit) {
+                return h("option", { key: unit, value: unit });
+              })
+            )
+          ),
+          h(
+            "div",
+            null,
+            fieldLabel("Ingredient"),
+            h("input", {
+              className: "recipe-input",
+              value: value.item || "",
+              placeholder: "unsalted butter",
+              onChange: function (event) {
+                update({ item: event.target.value });
+              },
+            })
+          )
+        )
+      );
+    };
+
+    return RecipeIngredientControl;
+  })(Component);
+
+  var RecipeSectionControl = (function (Super) {
+    function RecipeSectionControl(props) {
+      Super.call(this, props);
+    }
+
+    if (Super) RecipeSectionControl.__proto__ = Super;
+    RecipeSectionControl.prototype = Object.create(Super && Super.prototype);
+    RecipeSectionControl.prototype.constructor = RecipeSectionControl;
+
+    RecipeSectionControl.prototype.render = function () {
+      var self = this;
+      var value = this.props.value || {};
+      var label = value.label || "";
+
+      return h(
+        "div",
+        { className: "recipe-section-divider" },
+        h("span", { className: "recipe-section-line", "aria-hidden": true }),
+        h("input", {
+          className: "recipe-section-input",
+          value: label,
+          placeholder: "Section name",
+          onChange: function (event) {
+            self.props.onChange({ type: "section", label: event.target.value });
+          },
+        }),
+        h("span", { className: "recipe-section-line", "aria-hidden": true })
+      );
+    };
+
+    return RecipeSectionControl;
+  })(Component);
+
+  var RecipeStepControl = (function (Super) {
+    function RecipeStepControl(props) {
+      Super.call(this, props);
+    }
+
+    if (Super) RecipeStepControl.__proto__ = Super;
+    RecipeStepControl.prototype = Object.create(Super && Super.prototype);
+    RecipeStepControl.prototype.constructor = RecipeStepControl;
+
+    RecipeStepControl.prototype.render = function () {
+      var self = this;
+      var raw = this.props.value;
+      var text =
+        typeof raw === "string"
+          ? raw
+          : raw && (raw.text || raw.step)
+            ? raw.text || raw.step
+            : "";
+
+      return h(
+        "div",
+        { className: "recipe-card" },
+        fieldLabel("Step"),
+        h("textarea", {
+          className: "recipe-textarea",
+          value: text,
+          placeholder: "Describe what happens in this step…",
+          onChange: function (event) {
+            self.props.onChange(event.target.value);
+          },
+        })
+      );
+    };
+
+    return RecipeStepControl;
+  })(Component);
+
+  var RecipeNotesControl = (function (Super) {
+    function RecipeNotesControl(props) {
+      Super.call(this, props);
+      this.state = {
+        blocks: parseNotesMarkdown(props.value || ""),
+      };
+    }
+
+    if (Super) RecipeNotesControl.__proto__ = Super;
+    RecipeNotesControl.prototype = Object.create(Super && Super.prototype);
+    RecipeNotesControl.prototype.constructor = RecipeNotesControl;
+
+    RecipeNotesControl.prototype.componentDidUpdate = function (prevProps) {
+      if (prevProps.value !== this.props.value && this.props.value !== serializeNotesMarkdown(this.state.blocks)) {
+        this.setState({ blocks: parseNotesMarkdown(this.props.value || "") });
+      }
+    };
+
+    RecipeNotesControl.prototype.updateBlocks = function (blocks) {
+      this.setState({ blocks: blocks });
+      this.props.onChange(serializeNotesMarkdown(blocks));
+    };
+
+    RecipeNotesControl.prototype.render = function () {
+      var self = this;
+      var blocks = this.state.blocks;
+
+      function updateBlock(index, nextBlock) {
+        var next = blocks.slice();
+        next[index] = nextBlock;
+        self.updateBlocks(next);
+      }
+
+      function removeBlock(index) {
+        self.updateBlocks(blocks.filter(function (_, blockIndex) {
+          return blockIndex !== index;
+        }));
+      }
+
+      function addBlock(block) {
+        self.updateBlocks(blocks.concat([block]));
+      }
+
+      return h(
+        "div",
+        { className: "recipe-notes-editor" },
+        blocks.length === 0
+          ? h("p", { className: "recipe-notes-empty" }, "No notes yet. Add a block below.")
+          : blocks.map(function (block, index) {
+              if (block.type === "header") {
+                return h(
+                  "div",
+                  { key: index, className: "recipe-notes-block" },
+                  h("input", {
+                    className: "recipe-header-input",
+                    value: block.text,
+                    placeholder: "Section title",
+                    onChange: function (event) {
+                      updateBlock(index, { type: "header", text: event.target.value });
+                    },
+                  })
+                );
+              }
+
+              if (block.type === "section") {
+                return h(
+                  "div",
+                  { key: index, className: "recipe-notes-block recipe-section-divider" },
+                  h("span", { className: "recipe-section-line", "aria-hidden": true }),
+                  h("input", {
+                    className: "recipe-section-input",
+                    value: block.text,
+                    placeholder: "Section name",
+                    onChange: function (event) {
+                      updateBlock(index, { type: "section", text: event.target.value });
+                    },
+                  }),
+                  h("span", { className: "recipe-section-line", "aria-hidden": true })
+                );
+              }
+
+              return h(
+                "div",
+                { key: index, className: "recipe-notes-block recipe-card" },
+                h("textarea", {
+                  className: "recipe-textarea",
+                  value: block.text,
+                  placeholder: "Share tips, substitutions, or context…",
+                  onChange: function (event) {
+                    updateBlock(index, { type: "paragraph", text: event.target.value });
+                  },
+                })
+              );
+            }),
+        h(
+          "div",
+          { className: "recipe-notes-toolbar" },
+          h(
+            "button",
+            {
+              type: "button",
+              className: "recipe-notes-btn",
+              onClick: function () {
+                addBlock({ type: "paragraph", text: "" });
+              },
+            },
+            "+ Paragraph"
+          ),
+          h(
+            "button",
+            {
+              type: "button",
+              className: "recipe-notes-btn",
+              onClick: function () {
+                addBlock({ type: "header", text: "" });
+              },
+            },
+            "+ Header"
+          ),
+          h(
+            "button",
+            {
+              type: "button",
+              className: "recipe-notes-btn",
+              onClick: function () {
+                addBlock({ type: "section", text: "" });
+              },
+            },
+            "+ Section"
+          )
+        )
+      );
+    };
+
+    return RecipeNotesControl;
+  })(Component);
 
   function parseRecipeTime(value) {
     var normalized = (value || "").trim().toLowerCase();
@@ -151,7 +476,6 @@
     RecipeTimeControl.prototype.render = function () {
       var self = this;
       var parts = parseRecipeTime(this.props.value || "");
-      var inputStyle = { width: "4rem", flexShrink: 0 };
 
       function update(patch) {
         var next = { hours: parts.hours, minutes: parts.minutes };
@@ -161,39 +485,42 @@
 
       return h(
         "div",
-        { style: { display: "flex", flexWrap: "wrap", alignItems: "center", gap: "0.5rem" } },
+        { className: "recipe-time-row" },
         h("input", {
           type: "number",
           min: 0,
-          className: self.props.classNameWrapper,
+          className: "recipe-input recipe-time-input",
           id: self.props.forID,
-          style: inputStyle,
           value: parts.hours,
           placeholder: "0",
           onChange: function (event) {
             update({ hours: event.target.value });
           },
         }),
-        h("span", { style: { fontSize: "0.75rem", color: "#6b6560" } }, "hr"),
+        h("span", { className: "recipe-time-suffix" }, "hr"),
         h("input", {
           type: "number",
           min: 0,
           max: 59,
-          className: self.props.classNameWrapper,
-          style: inputStyle,
+          className: "recipe-input recipe-time-input",
           value: parts.minutes,
           placeholder: "0",
           onChange: function (event) {
             update({ minutes: event.target.value });
           },
         }),
-        h("span", { style: { fontSize: "0.75rem", color: "#6b6560" } }, "min")
+        h("span", { className: "recipe-time-suffix" }, "min")
       );
     };
 
     return RecipeTimeControl;
   })(Component);
 
+  CMS.registerWidget("recipeUnit", RecipeUnitControl);
+  CMS.registerWidget("recipeIngredient", RecipeIngredientControl);
+  CMS.registerWidget("recipeSection", RecipeSectionControl);
+  CMS.registerWidget("recipeStep", RecipeStepControl);
+  CMS.registerWidget("recipeNotes", RecipeNotesControl);
   CMS.registerWidget("recipeTime", RecipeTimeControl);
 
   CMS.registerEventListener({
