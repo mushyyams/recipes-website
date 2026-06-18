@@ -16,7 +16,7 @@ import {
   isValidRecipeSlug,
   type RecipeDifficulty,
 } from "@/lib/recipe-meta";
-import { getRecipeBySlug } from "@/lib/recipes";
+import { recipeSlugExists } from "@/lib/recipes";
 
 export type RecipeSubmission = {
   id: string;
@@ -155,9 +155,9 @@ export async function createSubmission(
   if (getIngredientItems(lines).length === 0 || getMethodSteps(stepLines).length === 0) {
     return { error: "Add at least one ingredient and one step." };
   }
-  if (getRecipeBySlug(slug)) {
+  if (recipeSlugExists(slug)) {
     return {
-      error: "A published recipe already uses this URL slug. Try a different one.",
+      error: "A recipe already uses this URL slug. Try a different one.",
     };
   }
 

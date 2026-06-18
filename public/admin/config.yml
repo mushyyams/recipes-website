@@ -12,6 +12,7 @@ media_folder: public/images/recipes
 public_folder: /images/recipes
 
 locale: en
+publish_mode: editorial_workflow
 
 preview_path: recipes/{{slug}}
 

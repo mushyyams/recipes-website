@@ -18,6 +18,7 @@ export type RecipeMeta = {
   servings: number;
   difficulty: "Easy" | "Medium" | "Advanced";
   featured: boolean;
+  draft: boolean;
   publishedAt: string;
   image: string;
   imageAlt: string;
@@ -46,6 +47,7 @@ function parseRecipeFile(filename: string): Recipe {
     servings: data.servings,
     difficulty: data.difficulty,
     featured: data.featured ?? false,
+    draft: data.draft === true,
     publishedAt: data.publishedAt,
     image: data.image,
     imageAlt: data.imageAlt,
@@ -60,16 +62,23 @@ export function getAllRecipes(): Recipe[] {
   const files = fs.readdirSync(RECIPES_DIR).filter((f) => f.endsWith(".md"));
   return files
     .map(parseRecipeFile)
+    .filter((recipe) => !recipe.draft)
     .sort(
       (a, b) =>
         new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime()
     );
 }
 
+export function recipeSlugExists(slug: string): boolean {
+  return fs.existsSync(path.join(RECIPES_DIR, `${slug}.md`));
+}
+
 export function getRecipeBySlug(slug: string): Recipe | undefined {
   const filePath = path.join(RECIPES_DIR, `${slug}.md`);
   if (!fs.existsSync(filePath)) return undefined;
-  return parseRecipeFile(`${slug}.md`);
+  const recipe = parseRecipeFile(`${slug}.md`);
+  if (recipe.draft) return undefined;
+  return recipe;
 }
 
 export function getFeaturedRecipes(): Recipe[] {
