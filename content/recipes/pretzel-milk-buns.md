@@ -7,8 +7,8 @@ excerpt: This milk bun recipe combines the sweet, fluffiness of an asian-style
 category: Snacks
 difficulty: Advanced
 tags: []
-prepTime: 10 min
-cookTime: 20 min
+prepTime: 48 hr
+cookTime: 15 min
 servings: 12
 featured: false
 publishedAt: 2026-06-19
