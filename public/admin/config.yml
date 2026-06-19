@@ -28,7 +28,7 @@ collections:
     identifier_field: title
     summary: "{{title}} — {{category}}"
     fields:
-      - label: Title
+      - label: Recipe title
         name: title
         widget: string
         hint: The name of your recipe as it appears on the site
@@ -36,10 +36,10 @@ collections:
       - label: URL slug
         name: slug
         widget: string
-        hint: Auto-generated from title — lowercase with hyphens, e.g. honey-garlic-salmon
+        hint: Lowercase letters, numbers, and hyphens only — e.g. honey-garlic-salmon
         pattern: ['^[a-z0-9]+(?:-[a-z0-9]+)*$', 'Use lowercase letters, numbers, and hyphens only']
 
-      - label: Excerpt
+      - label: Short description
         name: excerpt
         widget: text
         hint: One compelling sentence for cards and search results
@@ -55,6 +55,14 @@ collections:
           - Pasta
           - Dessert
           - Drinks
+
+      - label: Difficulty
+        name: difficulty
+        widget: select
+        options:
+          - Easy
+          - Medium
+          - Advanced
 
       - label: Tags
         name: tags
@@ -80,14 +88,7 @@ collections:
         widget: number
         value_type: int
         min: 1
-
-      - label: Difficulty
-        name: difficulty
-        widget: select
-        options:
-          - Easy
-          - Medium
-          - Advanced
+        default: 4
 
       - label: Featured on homepage
         name: featured
@@ -106,15 +107,16 @@ collections:
         widget: image
         allow_multiple: false
 
-      - label: Image alt text
+      - label: Image description
         name: imageAlt
         widget: string
+        hint: Describe the photo for accessibility
 
-      - label: TikTok video URL
+      - label: TikTok or video link
         name: video
         widget: string
         required: false
-        hint: Full TikTok link for this recipe (used in SEO and the sidebar CTA)
+        hint: Full TikTok link for this recipe
 
       - label: Ingredients
         name: ingredients

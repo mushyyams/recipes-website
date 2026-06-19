@@ -4,8 +4,8 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Community Archive — Content</title>
-    <link href="/admin/admin.css?v=2" rel="stylesheet" />
-    <link href="/admin/config.yml" type="text/yaml" rel="cms-config-url" />
+    <link href="/admin/admin.css?v=10" rel="stylesheet" />
+    <link href="/admin/config.yml?v=10" type="text/yaml" rel="cms-config-url" />
   </head>
   <body>
     <p style="font-family: 'DM Sans', system-ui, sans-serif; padding: 1rem 1.25rem; margin: 0; background: #faf7f2; border-bottom: 1px solid #e8e2d8; font-size: 0.875rem;">
@@ -13,7 +13,10 @@
       <a href="/admin/submissions" style="color: #b85c38; text-decoration: none; font-weight: 500; margin-right: 1.25rem;">Review recipe submissions →</a>
       <a href="/admin/units" style="color: #b85c38; text-decoration: none; font-weight: 500;">Manage recipe units →</a>
     </p>
-    <script src="https://unpkg.com/decap-cms@^3.8.3/dist/decap-cms.js"></script>
-    <script src="/admin/recipe-cms.js?v=2"></script>
+    <script>
+      window.CMS_MANUAL_INIT = true;
+    </script>
+    <script src="https://unpkg.com/decap-cms@3.8.3/dist/decap-cms.js"></script>
+    <script src="/admin/recipe-cms.js?v=10"></script>
   </body>
 </html>

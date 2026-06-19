@@ -1,8 +1,19 @@
-(function () {
-  var createElement = window.React.createElement;
-  var h = createElement;
-  var Component = window.React.Component;
+(function waitForDecap(attempt) {
+  var h = window.h;
+  var createClass = window.createClass;
+  var CMS = window.CMS;
 
+  if (!h || !createClass || !CMS) {
+    if (attempt < 50) {
+      return setTimeout(function () {
+        waitForDecap(attempt + 1);
+      }, 100);
+    }
+    console.error("Decap CMS globals (h, createClass, CMS) are unavailable.");
+    return;
+  }
+
+  (function () {
   function fetchFixedUnits() {
     return fetch("/api/units")
       .then(function (response) {
@@ -56,24 +67,17 @@
       .trim();
   }
 
-  var RecipeUnitControl = (function (Super) {
-    function RecipeUnitControl(props) {
-      Super.call(this, props);
-      this.state = { fixedUnits: [], loading: true };
-    }
-
-    if (Super) RecipeUnitControl.__proto__ = Super;
-    RecipeUnitControl.prototype = Object.create(Super && Super.prototype);
-    RecipeUnitControl.prototype.constructor = RecipeUnitControl;
-
-    RecipeUnitControl.prototype.componentDidMount = function () {
+  var RecipeUnitControl = createClass({
+    getInitialState: function () {
+      return { fixedUnits: [], loading: true };
+    },
+    componentDidMount: function () {
       var self = this;
       fetchFixedUnits().then(function (fixedUnits) {
         self.setState({ fixedUnits: fixedUnits, loading: false });
       });
-    };
-
-    RecipeUnitControl.prototype.render = function () {
+    },
+    render: function () {
       var value = this.props.value || "";
       var fixedUnits = this.state.fixedUnits;
       var self = this;
@@ -91,7 +95,7 @@
           className: "recipe-input",
           id: self.props.forID,
           value: value,
-          placeholder: "tsp, cup, g…",
+          placeholder: "tsp, cup, g...",
           onChange: function (event) {
             self.props.onChange(event.target.value);
           },
@@ -117,7 +121,8 @@
                   {
                     key: unit,
                     type: "button",
-                    className: "recipe-unit-chip" + (selected ? " is-selected" : ""),
+                    className:
+                      "recipe-unit-chip" + (selected ? " is-selected" : ""),
                     onClick: function () {
                       self.props.onChange(unit);
                     },
@@ -128,33 +133,69 @@
             )
           : null
       );
-    };
+    },
+  });
 
-    return RecipeUnitControl;
-  })(Component);
+  function removeActions(onRemove) {
+    return h(
+      "div",
+      { className: "recipe-list-actions" },
+      h(
+        "button",
+        {
+          type: "button",
+          className: "recipe-list-remove",
+          onClick: onRemove,
+        },
+        "Remove"
+      )
+    );
+  }
 
-  var RecipeIngredientControl = (function (Super) {
-    function RecipeIngredientControl(props) {
-      Super.call(this, props);
-      this.state = { fixedUnits: [] };
-    }
+  function unitChips(value, fixedUnits, onSelect) {
+    var quickPicks = QUICK_PICK_UNITS.filter(function (unit) {
+      return fixedUnits.length === 0 || fixedUnits.indexOf(unit) !== -1;
+    });
 
-    if (Super) RecipeIngredientControl.__proto__ = Super;
-    RecipeIngredientControl.prototype = Object.create(Super && Super.prototype);
-    RecipeIngredientControl.prototype.constructor = RecipeIngredientControl;
+    if (!quickPicks.length) return null;
 
-    RecipeIngredientControl.prototype.componentDidMount = function () {
+    return h(
+      "div",
+      { className: "recipe-unit-chips" },
+      quickPicks.map(function (unit) {
+        var selected = value.trim().toLowerCase() === unit;
+        return h(
+          "button",
+          {
+            key: unit,
+            type: "button",
+            className: "recipe-unit-chip" + (selected ? " is-selected" : ""),
+            onClick: function () {
+              onSelect(unit);
+            },
+          },
+          unit
+        );
+      })
+    );
+  }
+
+  var RecipeIngredientControl = createClass({
+    getInitialState: function () {
+      return { fixedUnits: [] };
+    },
+    componentDidMount: function () {
       var self = this;
       fetchFixedUnits().then(function (fixedUnits) {
         self.setState({ fixedUnits: fixedUnits });
       });
-    };
-
-    RecipeIngredientControl.prototype.render = function () {
+    },
+    render: function () {
       var self = this;
       var value = this.props.value || { amount: "", unit: "", item: "" };
       var fixedUnits = this.state.fixedUnits;
       var listId = "recipe-ingredient-unit-" + this.props.forID;
+      var unitValue = value.unit || "";
 
       function update(patch) {
         self.props.onChange(Object.assign({}, value, patch));
@@ -162,7 +203,7 @@
 
       return h(
         "div",
-        { className: "recipe-card" },
+        { className: "recipe-row-card" },
         h(
           "div",
           { className: "recipe-ingredient-grid" },
@@ -187,8 +228,8 @@
               type: "text",
               list: listId,
               className: "recipe-input",
-              value: value.unit || "",
-              placeholder: "tsp, cup, g…",
+              value: unitValue,
+              placeholder: "tsp, cup, g...",
               onChange: function (event) {
                 update({ unit: event.target.value });
               },
@@ -202,7 +243,10 @@
               fixedUnits.map(function (unit) {
                 return h("option", { key: unit, value: unit });
               })
-            )
+            ),
+            unitChips(unitValue, fixedUnits, function (unit) {
+              update({ unit: unit });
+            })
           ),
           h(
             "div",
@@ -219,54 +263,41 @@
           )
         )
       );
-    };
+    },
+  });
 
-    return RecipeIngredientControl;
-  })(Component);
-
-  var RecipeSectionControl = (function (Super) {
-    function RecipeSectionControl(props) {
-      Super.call(this, props);
-    }
-
-    if (Super) RecipeSectionControl.__proto__ = Super;
-    RecipeSectionControl.prototype = Object.create(Super && Super.prototype);
-    RecipeSectionControl.prototype.constructor = RecipeSectionControl;
-
-    RecipeSectionControl.prototype.render = function () {
+  var RecipeSectionControl = createClass({
+    render: function () {
       var self = this;
       var value = this.props.value || {};
       var label = value.label || "";
 
       return h(
         "div",
-        { className: "recipe-section-divider" },
-        h("span", { className: "recipe-section-line", "aria-hidden": true }),
-        h("input", {
-          className: "recipe-section-input",
-          value: label,
-          placeholder: "Section name",
-          onChange: function (event) {
-            self.props.onChange({ type: "section", label: event.target.value });
-          },
-        }),
-        h("span", { className: "recipe-section-line", "aria-hidden": true })
+        { className: "recipe-section-row" },
+        h(
+          "div",
+          { className: "recipe-section-divider" },
+          h("span", { className: "recipe-section-line", "aria-hidden": true }),
+          h("input", {
+            className: "recipe-section-input",
+            value: label,
+            placeholder: "Section name",
+            onChange: function (event) {
+              self.props.onChange({
+                type: "section",
+                label: event.target.value,
+              });
+            },
+          }),
+          h("span", { className: "recipe-section-line", "aria-hidden": true })
+        )
       );
-    };
+    },
+  });
 
-    return RecipeSectionControl;
-  })(Component);
-
-  var RecipeStepControl = (function (Super) {
-    function RecipeStepControl(props) {
-      Super.call(this, props);
-    }
-
-    if (Super) RecipeStepControl.__proto__ = Super;
-    RecipeStepControl.prototype = Object.create(Super && Super.prototype);
-    RecipeStepControl.prototype.constructor = RecipeStepControl;
-
-    RecipeStepControl.prototype.render = function () {
+  var RecipeStepControl = createClass({
+    render: function () {
       var self = this;
       var raw = this.props.value;
       var text =
@@ -276,48 +307,47 @@
             ? raw.text || raw.step
             : "";
 
+      var stepNumber = this.props.stepNumber || 1;
+
       return h(
         "div",
-        { className: "recipe-card" },
-        fieldLabel("Step"),
+        { className: "recipe-row-card" },
+        h(
+          "span",
+          { className: "recipe-step-label" },
+          "Step " + stepNumber
+        ),
         h("textarea", {
           className: "recipe-textarea",
           value: text,
-          placeholder: "Describe what happens in this step…",
+          placeholder: "Describe what happens in this step...",
           onChange: function (event) {
             self.props.onChange(event.target.value);
           },
         })
       );
-    };
+    },
+  });
 
-    return RecipeStepControl;
-  })(Component);
-
-  var RecipeNotesControl = (function (Super) {
-    function RecipeNotesControl(props) {
-      Super.call(this, props);
-      this.state = {
-        blocks: parseNotesMarkdown(props.value || ""),
+  var RecipeNotesControl = createClass({
+    getInitialState: function () {
+      return {
+        blocks: parseNotesMarkdown(this.props.value || ""),
       };
-    }
-
-    if (Super) RecipeNotesControl.__proto__ = Super;
-    RecipeNotesControl.prototype = Object.create(Super && Super.prototype);
-    RecipeNotesControl.prototype.constructor = RecipeNotesControl;
-
-    RecipeNotesControl.prototype.componentDidUpdate = function (prevProps) {
-      if (prevProps.value !== this.props.value && this.props.value !== serializeNotesMarkdown(this.state.blocks)) {
+    },
+    componentDidUpdate: function (prevProps) {
+      if (
+        prevProps.value !== this.props.value &&
+        this.props.value !== serializeNotesMarkdown(this.state.blocks)
+      ) {
         this.setState({ blocks: parseNotesMarkdown(this.props.value || "") });
       }
-    };
-
-    RecipeNotesControl.prototype.updateBlocks = function (blocks) {
+    },
+    updateBlocks: function (blocks) {
       this.setState({ blocks: blocks });
       this.props.onChange(serializeNotesMarkdown(blocks));
-    };
-
-    RecipeNotesControl.prototype.render = function () {
+    },
+    render: function () {
       var self = this;
       var blocks = this.state.blocks;
 
@@ -327,21 +357,27 @@
         self.updateBlocks(next);
       }
 
-      function removeBlock(index) {
-        self.updateBlocks(blocks.filter(function (_, blockIndex) {
-          return blockIndex !== index;
-        }));
-      }
-
       function addBlock(block) {
         self.updateBlocks(blocks.concat([block]));
       }
 
+      function removeBlock(index) {
+        self.updateBlocks(
+          blocks.filter(function (_, blockIndex) {
+            return blockIndex !== index;
+          })
+        );
+      }
+
       return h(
         "div",
-        { className: "recipe-notes-editor" },
+        { className: "recipe-notes-editor", "data-recipe-list": "notes" },
         blocks.length === 0
-          ? h("p", { className: "recipe-notes-empty" }, "No notes yet. Add a block below.")
+          ? h(
+              "p",
+              { className: "recipe-notes-empty" },
+              "No notes yet. Use the + button to add one."
+            )
           : blocks.map(function (block, index) {
               if (block.type === "header") {
                 return h(
@@ -352,8 +388,14 @@
                     value: block.text,
                     placeholder: "Section title",
                     onChange: function (event) {
-                      updateBlock(index, { type: "header", text: event.target.value });
+                      updateBlock(index, {
+                        type: "header",
+                        text: event.target.value,
+                      });
                     },
+                  }),
+                  removeActions(function () {
+                    removeBlock(index);
                   })
                 );
               }
@@ -361,30 +403,55 @@
               if (block.type === "section") {
                 return h(
                   "div",
-                  { key: index, className: "recipe-notes-block recipe-section-divider" },
-                  h("span", { className: "recipe-section-line", "aria-hidden": true }),
-                  h("input", {
-                    className: "recipe-section-input",
-                    value: block.text,
-                    placeholder: "Section name",
-                    onChange: function (event) {
-                      updateBlock(index, { type: "section", text: event.target.value });
-                    },
-                  }),
-                  h("span", { className: "recipe-section-line", "aria-hidden": true })
+                  {
+                    key: index,
+                    className: "recipe-notes-block recipe-section-row",
+                  },
+                  h(
+                    "div",
+                    { className: "recipe-section-divider" },
+                    h("span", {
+                      className: "recipe-section-line",
+                      "aria-hidden": true,
+                    }),
+                    h("input", {
+                      className: "recipe-section-input",
+                      value: block.text,
+                      placeholder: "Section name",
+                      onChange: function (event) {
+                        updateBlock(index, {
+                          type: "section",
+                          text: event.target.value,
+                        });
+                      },
+                    }),
+                    h("span", {
+                      className: "recipe-section-line",
+                      "aria-hidden": true,
+                    })
+                  ),
+                  removeActions(function () {
+                    removeBlock(index);
+                  })
                 );
               }
 
               return h(
                 "div",
-                { key: index, className: "recipe-notes-block recipe-card" },
+                { key: index, className: "recipe-notes-block recipe-row-card" },
                 h("textarea", {
                   className: "recipe-textarea",
                   value: block.text,
-                  placeholder: "Share tips, substitutions, or context…",
+                  placeholder: "Share tips, substitutions, or context...",
                   onChange: function (event) {
-                    updateBlock(index, { type: "paragraph", text: event.target.value });
+                    updateBlock(index, {
+                      type: "paragraph",
+                      text: event.target.value,
+                    });
                   },
+                }),
+                removeActions(function () {
+                  removeBlock(index);
                 })
               );
             }),
@@ -396,6 +463,7 @@
             {
               type: "button",
               className: "recipe-notes-btn",
+              "data-add": "paragraph",
               onClick: function () {
                 addBlock({ type: "paragraph", text: "" });
               },
@@ -407,6 +475,7 @@
             {
               type: "button",
               className: "recipe-notes-btn",
+              "data-add": "header",
               onClick: function () {
                 addBlock({ type: "header", text: "" });
               },
@@ -418,6 +487,7 @@
             {
               type: "button",
               className: "recipe-notes-btn",
+              "data-add": "section",
               onClick: function () {
                 addBlock({ type: "section", text: "" });
               },
@@ -426,17 +496,19 @@
           )
         )
       );
-    };
-
-    return RecipeNotesControl;
-  })(Component);
+    },
+  });
 
   function parseRecipeTime(value) {
     var normalized = (value || "").trim().toLowerCase();
     if (!normalized) return { hours: "", minutes: "" };
 
-    var hourMatch = normalized.match(/(\d+(?:\.\d+)?)\s*(?:h|hr|hrs|hour|hours)\b/);
-    var minMatch = normalized.match(/(\d+(?:\.\d+)?)\s*(?:m|min|mins|minute|minutes)\b/);
+    var hourMatch = normalized.match(
+      /(\d+(?:\.\d+)?)\s*(?:h|hr|hrs|hour|hours)\b/
+    );
+    var minMatch = normalized.match(
+      /(\d+(?:\.\d+)?)\s*(?:m|min|mins|minute|minutes)\b/
+    );
     var hours = hourMatch ? parseFloat(hourMatch[1]) : 0;
     var minutes = minMatch ? parseFloat(minMatch[1]) : 0;
 
@@ -464,16 +536,8 @@
     return "";
   }
 
-  var RecipeTimeControl = (function (Super) {
-    function RecipeTimeControl(props) {
-      Super.call(this, props);
-    }
-
-    if (Super) RecipeTimeControl.__proto__ = Super;
-    RecipeTimeControl.prototype = Object.create(Super && Super.prototype);
-    RecipeTimeControl.prototype.constructor = RecipeTimeControl;
-
-    RecipeTimeControl.prototype.render = function () {
+  var RecipeTimeControl = createClass({
+    render: function () {
       var self = this;
       var parts = parseRecipeTime(this.props.value || "");
 
@@ -511,10 +575,8 @@
         }),
         h("span", { className: "recipe-time-suffix" }, "min")
       );
-    };
-
-    return RecipeTimeControl;
-  })(Component);
+    },
+  });
 
   function isIngredientSectionItem(item) {
     return (
@@ -564,31 +626,16 @@
     return "";
   }
 
-  function listRemoveButton(onRemove) {
-    return h(
-      "button",
-      {
-        type: "button",
-        className: "recipe-list-remove",
-        onClick: onRemove,
-      },
-      "Remove"
-    );
+  function getStepDisplayNumber(items, index) {
+    var number = 0;
+    for (var i = 0; i <= index; i++) {
+      if (!isStepSectionItem(items[i])) number += 1;
+    }
+    return number;
   }
 
-  var RecipeIngredientsListControl = (function (Super) {
-    function RecipeIngredientsListControl(props) {
-      Super.call(this, props);
-    }
-
-    if (Super) RecipeIngredientsListControl.__proto__ = Super;
-    RecipeIngredientsListControl.prototype = Object.create(
-      Super && Super.prototype
-    );
-    RecipeIngredientsListControl.prototype.constructor =
-      RecipeIngredientsListControl;
-
-    RecipeIngredientsListControl.prototype.render = function () {
+  var RecipeIngredientsListControl = createClass({
+    render: function () {
       var self = this;
       var items = Array.isArray(this.props.value)
         ? this.props.value.map(normalizeIngredientItem)
@@ -614,9 +661,16 @@
 
       return h(
         "div",
-        { className: "recipe-list-editor" },
+        {
+          className: "recipe-list-editor",
+          "data-recipe-list": "ingredients",
+        },
         items.length === 0
-          ? h("p", { className: "recipe-notes-empty" }, "No ingredients yet.")
+          ? h(
+              "p",
+              { className: "recipe-notes-empty" },
+              "No ingredients yet. Use the + button to add one."
+            )
           : items.map(function (item, index) {
               if (isIngredientSectionItem(item)) {
                 return h(
@@ -629,7 +683,7 @@
                       updateAt(index, value);
                     },
                   }),
-                  listRemoveButton(function () {
+                  removeActions(function () {
                     removeAt(index);
                   })
                 );
@@ -645,7 +699,7 @@
                     updateAt(index, value);
                   },
                 }),
-                listRemoveButton(function () {
+                removeActions(function () {
                   removeAt(index);
                 })
               );
@@ -658,6 +712,7 @@
             {
               type: "button",
               className: "recipe-notes-btn",
+              "data-add": "ingredient",
               onClick: function () {
                 updateItems(
                   items.concat([{ amount: "", unit: "", item: "" }])
@@ -671,31 +726,20 @@
             {
               type: "button",
               className: "recipe-notes-btn",
+              "data-add": "section",
               onClick: function () {
-                updateItems(
-                  items.concat([{ type: "section", label: "" }])
-                );
+                updateItems(items.concat([{ type: "section", label: "" }]));
               },
             },
             "+ Section"
           )
         )
       );
-    };
+    },
+  });
 
-    return RecipeIngredientsListControl;
-  })(Component);
-
-  var RecipeStepsListControl = (function (Super) {
-    function RecipeStepsListControl(props) {
-      Super.call(this, props);
-    }
-
-    if (Super) RecipeStepsListControl.__proto__ = Super;
-    RecipeStepsListControl.prototype = Object.create(Super && Super.prototype);
-    RecipeStepsListControl.prototype.constructor = RecipeStepsListControl;
-
-    RecipeStepsListControl.prototype.render = function () {
+  var RecipeStepsListControl = createClass({
+    render: function () {
       var self = this;
       var items = Array.isArray(this.props.value)
         ? this.props.value.map(normalizeStepItem)
@@ -721,9 +765,13 @@
 
       return h(
         "div",
-        { className: "recipe-list-editor" },
+        { className: "recipe-list-editor", "data-recipe-list": "steps" },
         items.length === 0
-          ? h("p", { className: "recipe-notes-empty" }, "No steps yet.")
+          ? h(
+              "p",
+              { className: "recipe-notes-empty" },
+              "No steps yet. Use the + button to add one."
+            )
           : items.map(function (item, index) {
               if (isStepSectionItem(item)) {
                 return h(
@@ -736,7 +784,7 @@
                       updateAt(index, value);
                     },
                   }),
-                  listRemoveButton(function () {
+                  removeActions(function () {
                     removeAt(index);
                   })
                 );
@@ -747,12 +795,13 @@
                 { key: index, className: "recipe-list-item" },
                 h(RecipeStepControl, {
                   value: item,
+                  stepNumber: getStepDisplayNumber(items, index),
                   forID: self.props.forID + "-step-" + index,
                   onChange: function (value) {
                     updateAt(index, value);
                   },
                 }),
-                listRemoveButton(function () {
+                removeActions(function () {
                   removeAt(index);
                 })
               );
@@ -765,6 +814,7 @@
             {
               type: "button",
               className: "recipe-notes-btn",
+              "data-add": "step",
               onClick: function () {
                 updateItems(items.concat([""]));
               },
@@ -776,55 +826,38 @@
             {
               type: "button",
               className: "recipe-notes-btn",
+              "data-add": "section",
               onClick: function () {
-                updateItems(
-                  items.concat([{ type: "section", label: "" }])
-                );
+                updateItems(items.concat([{ type: "section", label: "" }]));
               },
             },
             "+ Section"
           )
         )
       );
-    };
+    },
+  });
 
-    return RecipeStepsListControl;
-  })(Component);
+  CMS.registerWidget("recipeUnit", RecipeUnitControl);
+  CMS.registerWidget("recipeIngredient", RecipeIngredientControl);
+  CMS.registerWidget("recipeSection", RecipeSectionControl);
+  CMS.registerWidget("recipeStep", RecipeStepControl);
+  CMS.registerWidget("recipeNotes", RecipeNotesControl);
+  CMS.registerWidget("recipeTime", RecipeTimeControl);
+  CMS.registerWidget("recipeIngredientsList", RecipeIngredientsListControl);
+  CMS.registerWidget("recipeStepsList", RecipeStepsListControl);
 
-  function registerRecipeWidgets() {
-    CMS.registerWidget("recipeUnit", RecipeUnitControl);
-    CMS.registerWidget("recipeIngredient", RecipeIngredientControl);
-    CMS.registerWidget("recipeSection", RecipeSectionControl);
-    CMS.registerWidget("recipeStep", RecipeStepControl);
-    CMS.registerWidget("recipeNotes", RecipeNotesControl);
-    CMS.registerWidget("recipeTime", RecipeTimeControl);
-    CMS.registerWidget("recipeIngredientsList", RecipeIngredientsListControl);
-    CMS.registerWidget("recipeStepsList", RecipeStepsListControl);
+  CMS.registerEventListener({
+    name: "preSave",
+    handler: function () {
+      try {
+        fetch("/api/units/track", { method: "POST" });
+      } catch (_error) {
+        // Non-blocking - save should still proceed
+      }
+    },
+  });
 
-    CMS.registerEventListener({
-      name: "preSave",
-      handler: function (_ref) {
-        var entry = _ref.entry;
-
-        try {
-          fetch("/api/units/track", { method: "POST" });
-        } catch (_error) {
-          // Non-blocking — save should still proceed
-        }
-
-        return entry;
-      },
-    });
-  }
-
-  function initRecipeCms() {
-    if (!window.CMS) {
-      window.setTimeout(initRecipeCms, 50);
-      return;
-    }
-
-    registerRecipeWidgets();
-  }
-
-  initRecipeCms();
-})();
+  CMS.init();
+  })();
+})(0);

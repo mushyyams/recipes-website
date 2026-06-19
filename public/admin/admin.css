@@ -45,15 +45,94 @@ body {
   color: var(--recipe-ink) !important;
 }
 
-/* Field labels */
+/* Field labels — match submission form field labels */
 [class*="WidgetLabel"],
 [class*="FieldLabel"],
 label[class*="Label"] {
-  font-size: 0.6875rem !important;
+  font-size: 0.875rem !important;
   font-weight: 500 !important;
-  letter-spacing: 0.15em !important;
-  text-transform: uppercase !important;
-  color: var(--recipe-sage) !important;
+  letter-spacing: normal !important;
+  text-transform: none !important;
+  color: var(--recipe-ink) !important;
+}
+
+/* Section headings inside grouped cards */
+.recipe-form-section > .recipe-section-heading {
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--recipe-sage);
+  margin: 0 0 1.5rem;
+}
+
+.recipe-form-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  border: 1px solid var(--recipe-stone);
+  border-radius: 1.5rem;
+  background: color-mix(in srgb, var(--recipe-parchment) 40%, transparent);
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.recipe-form-section-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.recipe-form-section[data-section="recipe-details"] .recipe-form-section-fields {
+  display: grid;
+  gap: 1.5rem;
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 768px) {
+  .recipe-form-section[data-section="recipe-details"] .recipe-form-section-fields {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .recipe-form-section[data-section="recipe-details"]
+    .recipe-form-field[data-field="title"],
+  .recipe-form-section[data-section="recipe-details"]
+    .recipe-form-field[data-field="slug"],
+  .recipe-form-section[data-section="recipe-details"]
+    .recipe-form-field[data-field="excerpt"],
+  .recipe-form-section[data-section="recipe-details"]
+    .recipe-form-field[data-field="tags"] {
+    grid-column: 1 / -1;
+  }
+}
+
+.recipe-form-section[data-section="timing"] .recipe-form-section-fields {
+  display: grid;
+  gap: 1.5rem;
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 768px) {
+  .recipe-form-section[data-section="timing"] .recipe-form-section-fields {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.recipe-form-field.recipe-hide-field-label > label,
+.recipe-form-field.recipe-hide-field-label > [class*="WidgetLabel"],
+.recipe-form-field.recipe-hide-field-label > [class*="FieldLabel"] {
+  display: none !important;
+}
+
+/* Editor width — match /submit max-w-3xl */
+[class*="ControlPane"] {
+  max-width: 48rem !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  padding-left: 1.5rem !important;
+  padding-right: 1.5rem !important;
+  padding-top: 2rem !important;
+  padding-bottom: 3rem !important;
 }
 
 [class*="ControlHint"],
@@ -72,7 +151,7 @@ input[type="search"],
 textarea,
 select,
 [class*="ControlInput"] {
-  border-radius: var(--recipe-radius) !important;
+  border-radius: 1rem !important;
   border: 1px solid var(--recipe-stone) !important;
   background: var(--recipe-cream) !important;
   color: var(--recipe-ink) !important;
@@ -133,7 +212,7 @@ button[class*="PrimaryButton"] {
 .recipe-textarea {
   width: 100%;
   box-sizing: border-box;
-  border-radius: var(--recipe-radius);
+  border-radius: 0.75rem;
   border: 1px solid var(--recipe-stone);
   background: var(--recipe-cream);
   color: var(--recipe-ink);
@@ -155,11 +234,20 @@ button[class*="PrimaryButton"] {
   line-height: 1.6;
 }
 
-.recipe-card {
+.recipe-card,
+.recipe-row-card {
   background: color-mix(in srgb, var(--recipe-parchment) 60%, white);
   border: 1px solid var(--recipe-stone);
-  border-radius: var(--recipe-radius-lg);
+  border-radius: 1rem;
   padding: 1rem;
+}
+
+.recipe-step-label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--recipe-ink);
 }
 
 .recipe-ingredient-grid {
@@ -319,16 +407,102 @@ button[class*="PrimaryButton"] {
 }
 
 .recipe-list-remove {
-  margin-top: 0.5rem;
-  border: 0;
+  margin-top: 0;
+  border: 1px solid color-mix(in srgb, var(--recipe-clay) 30%, transparent);
+  border-radius: 9999px;
   background: transparent;
   color: var(--recipe-clay);
-  font-size: 0.8125rem;
+  font-size: 0.75rem;
   cursor: pointer;
   font-family: var(--recipe-font-body);
-  padding: 0;
+  padding: 0.25rem 0.75rem;
 }
 
 .recipe-list-remove:hover {
-  text-decoration: underline;
+  background: color-mix(in srgb, var(--recipe-clay) 10%, transparent);
+  text-decoration: none;
+}
+
+.recipe-list-actions {
+  margin-top: 0.75rem;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.recipe-section-row {
+  padding: 0.25rem 0;
+}
+
+/* Floating add toolbar — matches /submit */
+.recipe-floating-toolbar {
+  position: fixed;
+  z-index: 40;
+  transition: opacity 120ms ease-out;
+}
+
+.recipe-floating-toolbar.is-hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.recipe-floating-toolbar-btn {
+  display: flex;
+  height: 4rem;
+  width: 2.5rem;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.125rem;
+  border-radius: 1rem;
+  border: 1px solid var(--recipe-stone-dark);
+  background: var(--recipe-parchment);
+  color: var(--recipe-ink);
+  box-shadow: 0 4px 6px color-mix(in srgb, var(--recipe-ink) 8%, transparent);
+  cursor: pointer;
+  font-family: var(--recipe-font-body);
+}
+
+.recipe-floating-toolbar-btn:hover,
+.recipe-floating-toolbar-btn.is-open {
+  border-color: var(--recipe-sage);
+  background: var(--recipe-sage);
+  color: var(--recipe-cream);
+}
+
+.recipe-floating-toolbar-btn span {
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.recipe-floating-menu {
+  position: absolute;
+  left: calc(100% + 0.75rem);
+  top: 50%;
+  transform: translateY(-50%);
+  min-width: 11.5rem;
+  overflow: hidden;
+  border-radius: 1rem;
+  border: 1px solid var(--recipe-stone);
+  background: var(--recipe-cream);
+  padding: 0.25rem 0;
+  box-shadow: 0 10px 15px color-mix(in srgb, var(--recipe-ink) 10%, transparent);
+}
+
+.recipe-floating-menu button {
+  display: block;
+  width: 100%;
+  border: 0;
+  background: transparent;
+  padding: 0.625rem 1rem;
+  text-align: left;
+  font-size: 0.875rem;
+  color: var(--recipe-ink);
+  cursor: pointer;
+  font-family: var(--recipe-font-body);
+}
+
+.recipe-floating-menu button:hover {
+  background: var(--recipe-parchment);
 }
